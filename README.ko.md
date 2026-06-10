@@ -1,7 +1,9 @@
 # superloop-skill
 
-`/loop` 위에서 도는 반복 미션에 규율을 부여하는 Claude Code 스킬. supergoal-skill의
+`/loop` 위에서 도는 반복 미션에 규율을 부여하는 Claude Code 스킬. [supergoal-skill](https://github.com/cskwork/supergoal-skill)의
 "baseline-first" 원칙을 루프 환경(틱 단위 실행, 컨텍스트 압축, 무인 자율 동작)에 맞게 확장했다.
+
+**랜딩 페이지**: https://cskwork.github.io/superloop-skill/ (한/영 토글) · **English**: [README.md](README.md)
 
 ## 개념
 
