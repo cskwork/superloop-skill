@@ -1,6 +1,6 @@
 ---
 name: superloop
-description: Use when running recurring or self-paced /loop missions over a project - "/superloop", "superloop", "/loop /superloop <mission>", auto-documentation sweeps (문서화 루프), bug / code-smell hunting-and-fixing loops, QA on recent commits with side-effect checks (최근 커밋 QA, 사이드이펙트 점검), or end-to-end Jira ticket resolution loops (ticket -> branch -> fix -> test -> build -> DB/API check -> local verify -> aidt-dev deploy -> post-deploy QA). Not for one-off tasks - use supergoal directly.
+description: "Run recurring project missions with a per-tick contract: documentation sweeps, bug/code-smell loops, recent-commit QA, or end-to-end Jira resolution. Use supergoal for one-off tasks."
 ---
 
 # /superloop - mission discipline on top of /loop
