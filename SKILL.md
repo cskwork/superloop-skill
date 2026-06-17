@@ -83,6 +83,7 @@ survives compaction because state lives on disk, not in context.
 | Read this | When |
 |---|---|
 | `reference/loop-runtime.md` | Launching a loop, PACE step, Monitor wiring, stopping |
+| `reference/loop-runner-pitfalls.md` | Building your own dispatcher (not `/loop`) - shell bugs that silently drop work |
 | `reference/state-ledger.md` + `templates/ledger.md` | ORIENT/RECORD - ledger schema and reconciliation |
 | `reference/mission-docs.md` | `docs` mission tick |
 | `reference/mission-smells.md` | `smells` mission tick |
