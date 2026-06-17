@@ -1,6 +1,6 @@
 ---
 name: superloop
-description: "Run recurring project missions with a per-tick contract: documentation sweeps, bug/code-smell loops, recent-commit QA, or end-to-end Jira resolution. Use supergoal for one-off tasks."
+description: Use when running recurring /loop project missions under a per-tick contract - documentation sweeps, bug/code-smell loops, recent-commit QA, or end-to-end Jira resolution. Use supergoal for one-off tasks.
 ---
 
 # /superloop - mission discipline on top of /loop
