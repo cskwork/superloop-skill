@@ -34,6 +34,13 @@ the finding is confirmed by a failing test.
   `awaiting-approval` escalation with the evidence.
 - Side-effect findings name the *other* flow that breaks, with the test/query that proves it.
 
+## Named stop conditions (escalate, don't grind)
+
+- `same_regression_seen_twice` - the same side-effect finding resurfaces after a fix -> stop and
+  report; the fix approach is wrong, not the test.
+- `green_signal_wrong_outcome` - tests/build pass but the response body or DB state contradicts the
+  ticket's intent -> `fail(finding)` with the proving query, escalate. A 200 is not a pass.
+
 ## VERIFY / RECORD
 
 - Advance `Cursor.last-verified-SHA` only past groups with a recorded verdict + evidence path.

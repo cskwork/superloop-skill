@@ -15,6 +15,10 @@ survives compaction because state lives on disk, not in context.
 - `/superloop docs` - single tick now (also how every cron/wakeup fire re-enters)
 - Put `/superloop <mission>` lines in `.claude/loop.md` to run missions via the bare `/loop` default
 
+**Recording.** The live **Board** is the default recording surface: the first tick starts it
+(`bash tui/launch.sh`, opt-out, best-effort) and every tick emits a heartbeat. The ledger stays the
+durable record; the Board is a live lens that never gates a tick (`reference/observability.md`).
+
 ## Missions
 
 | Arg | Mission | Reference |
@@ -27,6 +31,10 @@ survives compaction because state lives on disk, not in context.
 
 ## Core principles
 
+- **Contract before the first tick.** Each loop has a one-page contract - trigger, scope,
+  permissions, budget, stop, report, mode, owns. The clearest contract (not the most agents) is what
+  makes an unattended loop trustworthy. Write it from `templates/contract.md`, record it in the
+  ledger's `## Contract`, read it every ORIENT (`reference/loop-contract.md`).
 - **One unit of work per tick.** The smallest independently verifiable unit (one doc page, one
   smell, one commit reviewed, one ticket stage). Never batch units to "use the tick well" - a
   half-verified batch is worth less than one verified unit.
@@ -37,14 +45,19 @@ survives compaction because state lives on disk, not in context.
   correct change, failing test first, verify vs real tests/spec) - superloop adds the loop contract,
   not a parallel methodology. For full-pipeline work reuse existing skills (`jira-resolve`,
   `qa-engineer`, `sql-check`, `service-build`) instead of reinventing them.
+- **Write missions isolate in a worktree.** `smells` and `jira` (from FIX on) edit a dedicated git
+  worktree, never the working branch directly, and merge back only after a green VERIFY plus consent
+  (`reference/worktree.md`). Read-only missions (`docs`, `qa`) need none.
 - **Ground truth per tick.** A tick without verification evidence (test run, build output, HTTP
   response, read-only DB query) records `unverified`, never `done`.
 
 ## Tick anatomy (every tick, every mission)
 
-1. **ORIENT.** Read the ledger. First tick: bootstrap it from `templates/ledger.md` and build the
-   initial queue per the mission reference. Reconcile ledger vs reality (current branch, git log,
-   running servers) - reality wins; note drift in the ledger.
+1. **ORIENT.** Read the ledger, contract included. First tick: bootstrap the ledger from
+   `templates/ledger.md`, copy the loop contract from `templates/contract.md` into `## Contract`,
+   start the Board (`bash tui/launch.sh &`, best-effort), and build the initial queue per the mission
+   reference. Reconcile ledger vs reality (current branch, git log, running servers, the mission
+   worktree) - reality wins; note drift in the ledger.
 2. **PICK.** Take the single highest-priority unit not `done`/`blocked`/`awaiting-approval`. If the
    queue is empty, refresh it from the mission's source (new commits, new tickets); still empty ->
    record an empty tick and back off (see Safety rails). **Never invent work** to look busy -
@@ -53,10 +66,12 @@ survives compaction because state lives on disk, not in context.
    surgical: touch only what the unit requires.
 4. **VERIFY.** Re-run the relevant ground truth and capture command output as evidence. Failed
    verification -> the unit stays open; record the failure and what was learned.
-5. **RECORD.** Append a tick entry to the ledger (unit, result, evidence pointer, next action) and
-   advance the cursor. If code changed, also write the reasoning to
+5. **RECORD.** Append a tick entry to the ledger (unit, result, evidence pointer, next action),
+   advance the cursor, and bump the budget counters (ticks used, files changed, ticks since
+   check-in). If code changed, also write the reasoning to
    `docs/changelog/changelog-YYYY-MM-DD.md`. Report the tick to the user in one short block
-   (`templates/tick-report.md`).
+   (`templates/tick-report.md`), and emit a Board heartbeat (`sl-emit`,
+   `reference/observability.md`) - best-effort, never gates.
 6. **PACE.** Schedule the next tick per `reference/loop-runtime.md`: fixed-interval loops need
    nothing (cron refires); dynamic loops MUST end the turn with ScheduleWakeup carrying the original
    `/loop ...` prompt; event-gated waits (CI, Jenkins deploy, PR review) arm a Monitor instead of
@@ -77,6 +92,21 @@ survives compaction because state lives on disk, not in context.
   a longer interval). After 3 consecutive empty ticks, propose stopping the loop.
 - **Tick budget.** A unit must complete inside one tick. If it can't, split it into sub-units in the
   ledger and complete the first - never leave a tick half-done with no record.
+- **Budget ceiling.** The contract's `budget` bounds the loop's cumulative life, not just one unit -
+  `max_ticks`, `max_files_per_unit`, `max_runtime_per_tick`, `checkin_every_n_ticks`
+  (`reference/loop-contract.md`). When any ceiling is hit, **stop cleanly and report** (or pause as
+  `awaiting-approval(checkin)`); an unattended loop with no ceiling can burn a weekend of spend
+  grinding one unit. Never widen the budget mid-run to "just finish."
+- **Progressive autonomy & single-writer ownership.** New or custom loops start `mode: report-only`
+  - propose and gate every write; promote to `write` only once the signal is consistently useful.
+  Each loop writes only what it names in the contract's `owns` (branch / ledger / worktree / file
+  glob); concurrent loops stay read-only outside their owned scope and use distinct worktrees
+  (`reference/loop-contract.md`).
+- **Escalation triggers.** Beyond the failure counters, escalate to the user (mark
+  `awaiting-approval` or stop) the moment: behavior is genuinely ambiguous; the safe action needs a
+  permission the contract withholds; a fix would widen scope past `max_files_per_unit`; tests
+  contradict each other or the spec; or a green signal hides a wrong outcome (deploy healthy but the
+  page is wrong). A surprising-but-not-failing state is a reason to ask, not to push on.
 
 ## Reference map (load only what the tick needs)
 
@@ -84,11 +114,14 @@ survives compaction because state lives on disk, not in context.
 |---|---|
 | `reference/loop-runtime.md` | Launching a loop, PACE step, Monitor wiring, stopping |
 | `reference/loop-runner-pitfalls.md` | Building your own dispatcher (not `/loop`) - shell bugs that silently drop work |
+| `reference/loop-contract.md` + `templates/contract.md` | Before the first tick - the loop contract (scope, permissions, budget, stop, mode, owns) |
 | `reference/state-ledger.md` + `templates/ledger.md` | ORIENT/RECORD - ledger schema and reconciliation |
 | `reference/mission-docs.md` | `docs` mission tick |
 | `reference/mission-smells.md` | `smells` mission tick |
 | `reference/mission-qa.md` | `qa` mission tick |
 | `reference/mission-jira.md` | `jira` mission tick |
+| `reference/worktree.md` | Write missions (`smells`/`jira`) - isolating edits in a git worktree |
+| `reference/observability.md` + `tui/` | Recording - the live Board (default surface) and `sl-emit` heartbeats |
 | `templates/tick-report.md` | RECORD - user-facing tick summary |
 
 ## Per-tick checklist (before ending the tick)
@@ -98,4 +131,5 @@ survives compaction because state lives on disk, not in context.
 - [ ] Verification evidence captured (command output) or the unit recorded as not-done
 - [ ] Consent gates respected - `awaiting-approval` recorded, nothing outward without explicit consent
 - [ ] Failure counters updated; circuit breaker applied if tripped
+- [ ] Budget counters bumped; loop stopped or paused for check-in if any contract ceiling is hit
 - [ ] Next tick paced: cron refire / ScheduleWakeup as the last action / Monitor armed once

@@ -35,4 +35,13 @@ that would force a wide rename across modules (log as `blocked(too-wide)` for a 
 
 - Mark the unit `done` with the red->green evidence. Changelog entry: smell, why it was a risk, fix
   reasoning.
-- Fixes land on the current working branch; pushing or merging anywhere shared is a consent gate.
+- Fixes land in the mission **worktree** (`.superloop/smells/worktree`, see `reference/worktree.md`),
+  never on the working branch directly. Merging into the working branch happens only after a green
+  VERIFY; pushing or merging anywhere shared is a consent gate.
+
+## Named stop conditions (escalate, don't grind)
+
+- `tests_fail_after_one_fix` - one fix attempt didn't green the suite -> revert the change, mark the
+  smell `blocked` with the red output; never iterate fixes blindly.
+- `fix_reverts_a_passing_test` - the "improvement" turns a previously green test red -> stop and
+  revert; a refactor that changes behavior is a bug, not a cleanup.

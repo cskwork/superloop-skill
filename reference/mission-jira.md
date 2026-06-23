@@ -12,7 +12,7 @@ RECORD. Use the stages below when working a ticket directly.
 |---|---|---|
 | **FETCH** | Pick the next ticket via jira-ascli (assigned, status To Do/Open, project per Config JQL; oldest-priority first). Pull description, comments, attachments. | Ticket key + acceptance criteria restated in one line in the ledger |
 | **ANALYZE** | Reproduce/locate: trace API -> Controller -> Service -> DAO -> table (aidt-api-table-debugger), read related code, check DB state read-only. Classify frontend/backend/mixed. | Root cause or implementation point named, with file:line |
-| **BRANCH** | From up-to-date `origin/aidt-prd`: `fix/{TICKET}` (or `feat/{TICKET}`), per the jira-feature command rules. Run git inside the affected **service directory** (each service is its own repo/submodule), never the monorepo root. | Branch checked out, base verified with `git log -1 origin/aidt-prd` |
+| **BRANCH** | From up-to-date `origin/aidt-prd`: create `fix/{TICKET}` (or `feat/{TICKET}`) as a **linked worktree** at `.superloop/jira/worktree` (`reference/worktree.md`) so the service checkout stays clean while the loop works unattended, per the jira-feature command rules. Run git inside the affected **service directory** (each service is its own repo/submodule), never the monorepo root. | Worktree on `fix/{TICKET}` checked out, base verified with `git log -1 origin/aidt-prd` |
 | **FIX** | Supergoal DEBUG: reproduce with a **failing test first**, then the smallest change to green. Match surrounding style; no drive-by refactors. | New test red -> green; diff is minimal |
 | **TEST** | Full relevant suite for the touched service (aidt: standaloneSetup patterns per aidt-testing-patterns). | Suite green, output saved to `evidence/` |
 | **BUILD** | Build/boot the service per the service-build skill (run-server.sh / run-audit.sh, `GRADLE_USER_HOME` inside the service dir). | Build succeeds; app boots; health endpoint responds |
@@ -31,6 +31,16 @@ RECORD. Use the stages below when working a ticket directly.
   SKILL.md); escalate in the tick report rather than brute-forcing.
 - Anything found broken on dev that this ticket didn't cause: log it as a finding (candidate new
   ticket), don't silently widen this ticket's scope.
+
+## Named stop conditions (escalate, don't grind)
+
+- `tests_fail_after_one_fix` - the FIX stage's first attempt didn't green the suite -> stop and
+  report with the red output; don't iterate fixes blindly across ticks.
+- `merge_conflict_requires_product_decision` - a rebase/merge conflict that needs a human call ->
+  `awaiting-approval`, never guess a resolution.
+- `green_signal_wrong_outcome` - POST-DEPLOY env health is green but the page/behavior is wrong (the
+  browser E2E or side-effect sweep disagrees with the health check) -> stop, escalate with evidence.
+  A healthy deploy is not a correct deploy; trust the page, not the 200.
 
 ## Per-stage record
 

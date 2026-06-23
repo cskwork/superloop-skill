@@ -1,0 +1,46 @@
+# Worktree isolation - write missions get their own checkout
+
+Write missions (`smells`, `jira` from FIX on) **never mutate the working branch directly**. They work
+in a dedicated git worktree and merge back only after a green VERIFY and explicit consent. Read-only
+missions (`docs`, `qa`) need no worktree.
+
+## Why
+
+An unattended loop that edits the working branch directly, across many ticks with compaction in
+between, is the riskiest shape of automation: it can leave the user's checkout half-changed, collide
+with work the user is doing in the same tree, or lose track of what is staged after a restart. A
+linked worktree gives the loop a checkout it owns and may mutate freely; the working branch stays
+clean until the loop has something verified and consented to merge. This is also the loop's clear
+**write space** - the `owns` field of the contract - so two loops never fight over one tree.
+
+## Layout
+
+One worktree per write mission, a linked worktree of the **target repo** (for aidt, the affected
+**service** repo, not the monorepo root):
+
+```
+.superloop/<mission>/worktree/        # git worktree add <here> <branch>, off the mission's base
+```
+
+`.superloop/` is already loop-local working state (gitignored unless the user wants the trail). The
+worktree root resolves to its own path, so `sl-emit` reports it distinctly on the Board.
+
+## Lifecycle
+
+1. **Create** when the first write unit starts (smells: first fix; jira: BRANCH stage). `git worktree
+   add .superloop/<mission>/worktree <branch>` from the mission's verified base.
+2. **Work** every tick inside that worktree - edits, tests, build, local verify all run there.
+3. **Reconcile at ORIENT.** Confirm the worktree exists and sits on the expected branch; if git
+   disagrees (user removed it, branch moved), reality wins - repair or recreate before picking.
+4. **Merge** into the working or shared branch only after VERIFY is green **and** consent is given.
+   Merging to a shared branch (`aidt-dev`, etc.) is already a consent gate (SKILL.md); the worktree
+   does not change that - it just keeps the working branch clean until that gate passes.
+5. **Remove** the worktree (`git worktree remove`) once the unit/ticket is merged and `done`, so a
+   stale checkout never lingers between loops.
+
+## Failure / ownership notes
+
+- A worktree that can't be created (dirty path, git too old) -> mark the unit `blocked(worktree)` and
+  escalate; do not silently fall back to editing the working branch.
+- One loop owns each worktree. A second loop on the same mission/repo must use a distinct worktree
+  path (or wait) - shared write is the thing isolation exists to prevent.
