@@ -68,6 +68,36 @@ require_text "consecutive-failure circuit breaker" "SKILL.md" "consecutive faile
 require_text "destructive/outward steps need consent" "SKILL.md" "explicit consent"
 require_text "nothing-to-do backs off, never invents work" "SKILL.md" "never invent work"
 
+# Loop contract: one declarative page per loop (trigger/scope/permissions/budget/stop/report/mode/owns).
+require_file "loop-contract reference exists" "reference/loop-contract.md"
+require_file "contract template exists" "templates/contract.md"
+require_text "contract bootstrapped before the first tick" "SKILL.md" "loop-contract.md"
+require_text "contract fields named" "SKILL.md" "permissions, budget, stop, report, mode, owns"
+
+# Cumulative hard budget, beyond per-unit tick budget and consecutive-failure breaker.
+require_text "cumulative budget ceiling rail" "SKILL.md" "Budget ceiling"
+require_text "budget caps total ticks" "SKILL.md" "max_ticks"
+require_text "budget forces periodic check-in" "SKILL.md" "checkin_every_n_ticks"
+
+# Write missions isolate in a worktree, never the working branch directly.
+require_file "worktree reference exists" "reference/worktree.md"
+require_text "write missions isolate in a worktree" "SKILL.md" "isolate in a worktree"
+
+# Progressive autonomy (start report-only) and single-writer ownership across concurrent loops.
+require_text "loops can start report-only" "SKILL.md" "report-only"
+require_text "single-writer ownership rail" "SKILL.md" "single-writer ownership"
+require_text "ownership: one writer per resource" "reference/loop-contract.md" "one writer per resource"
+
+# Escalation triggers beyond the failure counters.
+require_text "escalation triggers enumerated" "SKILL.md" "Escalation triggers"
+require_text "green signal can hide a wrong outcome" "SKILL.md" "page is wrong"
+
+# Mission-specific named stop conditions (escalate at the first principled signal).
+require_text "loop contract names semantic stops" "reference/loop-contract.md" "Named stop conditions"
+require_text "jira names a product-decision stop" "reference/mission-jira.md" "merge_conflict_requires_product_decision"
+require_text "qa names a green-but-wrong stop" "reference/mission-qa.md" "green_signal_wrong_outcome"
+require_text "smells stops after one failed fix" "reference/mission-smells.md" "tests_fail_after_one_fix"
+
 # Final checklist exists.
 require_text "per-tick checklist present" "SKILL.md" "Per-tick checklist"
 

@@ -1,3 +1,5 @@
 .superloop/
 .DS_Store
 .superdesign/
+__pycache__/
+*.pyc
