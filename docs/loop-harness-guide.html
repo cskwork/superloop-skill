@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>루프 & 하네스 엔지니어링: 초보자 가이드</title>
+<meta name="description" content="AI 코딩 에이전트의 루프와 하네스를 처음부터 배우는 슬라이드 가이드. Anthropic 엔지니어링 검증 사실과 superloop 실사례 기반." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<style>
+  :root{
+    --canvas:#0F1115;
+    --panel:#161922;
+    --panel-2:#1B1F29;
+    --panel-3:#212635;
+    --border:#2B313D;
+    --border-soft:#232936;
+    --ink:#E9EBEF;
+    --muted:#A7ADBA;
+    --faint:#868D9C;
+    --accent:#E3A53C;
+    --accent-soft:rgba(227,165,60,0.13);
+    --accent-line:rgba(227,165,60,0.34);
+    --accent-ink:#1A1305;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:"Pretendard Variable",Pretendard,system-ui,-apple-system,sans-serif;
+    --radius:14px;
+    --radius-sm:9px;
+    --sidebar-w:300px;
+    --ease:cubic-bezier(0.22,0.61,0.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  html[lang="ko"]{word-break:keep-all}
+  body{
+    font-family:var(--sans);
+    background:var(--canvas);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    min-height:100dvh;
+    overflow:hidden;
+  }
+  ::selection{background:var(--accent-soft);color:var(--ink)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline;text-underline-offset:3px}
+
+  .app{
+    display:grid;
+    grid-template-columns:var(--sidebar-w) 1fr;
+    height:100dvh;
+  }
+
+  /* ---------- Sidebar / TOC ---------- */
+  .sidebar{
+    background:var(--panel);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .brand{
+    padding:22px 22px 16px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .brand .kick{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  .brand h1{
+    font-size:18px;
+    line-height:1.3;
+    font-weight:700;
+    margin-top:7px;
+    letter-spacing:-0.01em;
+  }
+  .brand p{font-size:12.5px;color:var(--faint);margin-top:6px}
+
+  .toc{
+    flex:1;
+    overflow-y:auto;
+    padding:12px 12px 20px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--border) transparent;
+  }
+  .toc::-webkit-scrollbar{width:8px}
+  .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+  .toc-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--faint);
+    padding:8px 10px 6px;
+  }
+  .toc ol{list-style:none}
+  .toc-item{
+    width:100%;
+    display:flex;
+    align-items:baseline;
+    gap:11px;
+    padding:9px 11px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:var(--sans);
+    font-size:13.5px;
+    text-align:left;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    transition:background .18s var(--ease),color .18s var(--ease);
+    line-height:1.35;
+  }
+  .toc-item .num{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--faint);
+    flex:none;
+    width:18px;
+    transition:color .18s var(--ease);
+  }
+  .toc-item:hover{background:var(--panel-2);color:var(--ink)}
+  .toc-item:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .toc-item[aria-current="true"]{
+    background:var(--accent-soft);
+    color:var(--ink);
+    box-shadow:inset 2px 0 0 var(--accent);
+  }
+  .toc-item[aria-current="true"] .num{color:var(--accent)}
+
+  .side-foot{
+    padding:13px 22px 18px;
+    border-top:1px solid var(--border-soft);
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--faint);
+    letter-spacing:0.04em;
+  }
+  .side-foot b{color:var(--muted);font-weight:600}
+
+  /* ---------- Stage ---------- */
+  .stage{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    min-height:0;
+    background:
+      radial-gradient(1100px 520px at 88% -8%, rgba(227,165,60,0.06), transparent 60%),
+      var(--canvas);
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:14px 30px;
+    border-bottom:1px solid var(--border-soft);
+    flex:none;
+  }
+  .progress{
+    flex:1;
+    height:4px;
+    background:var(--panel-2);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:8%;
+    background:var(--accent);
+    border-radius:99px;
+    transition:width .35s var(--ease);
+  }
+  .counter{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.06em;
+    flex:none;
+    min-width:62px;
+    text-align:right;
+  }
+  .counter b{color:var(--ink);font-weight:600}
+  .nav-btns{display:flex;gap:8px;flex:none}
+  .nav-btn{
+    width:38px;height:38px;
+    display:grid;place-items:center;
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    color:var(--ink);
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-size:17px;
+    transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease),opacity .16s var(--ease);
+  }
+  .nav-btn:hover:not(:disabled){background:var(--panel-3);border-color:var(--accent-line)}
+  .nav-btn:active:not(:disabled){transform:translateY(1px)}
+  .nav-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .nav-btn:disabled{opacity:0.34;cursor:not-allowed}
+
+  .deck{
+    flex:1;
+    position:relative;
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:thin;
+    scrollbar-color:var(--border) transparent;
+  }
+  .deck::-webkit-scrollbar{width:10px}
+  .deck::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+
+  .slide{
+    display:none;
+    padding:46px 56px 60px;
+    max-width:1060px;
+    margin:0 auto;
+  }
+  .slide.active{display:block}
+  @media (prefers-reduced-motion: no-preference){
+    .slide.active{animation:rise .42s var(--ease) both}
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  }
+
+  .kick{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+  }
+  .kick::before{
+    content:"";
+    width:22px;height:1px;
+    background:var(--accent-line);
+  }
+  .slide h2{
+    font-size:clamp(26px,3.4vw,40px);
+    line-height:1.12;
+    letter-spacing:-0.025em;
+    font-weight:750;
+    margin:16px 0 0;
+  }
+  .lead{
+    font-size:16px;
+    color:var(--muted);
+    max-width:62ch;
+    margin-top:16px;
+  }
+  .lead strong{color:var(--ink);font-weight:600}
+  .src{
+    margin-top:26px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--faint);
+    letter-spacing:0.03em;
+  }
+  .src i{color:var(--accent);font-style:normal}
+
+  /* cards & grids */
+  .grid{display:grid;gap:14px;margin-top:30px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{
+    background:var(--panel-2);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .card .ic{
+    width:38px;height:38px;border-radius:10px;
+    display:grid;place-items:center;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:20px;
+    margin-bottom:14px;
+  }
+  .card h3{font-size:15.5px;font-weight:650;letter-spacing:-0.01em}
+  .card .tag{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--faint);
+  }
+  .card p{font-size:13.5px;color:var(--muted);margin-top:9px}
+  .card p b{color:var(--ink);font-weight:600}
+
+  /* numbered list (steps / best practices) */
+  .rows{margin-top:28px;display:flex;flex-direction:column;gap:11px}
+  .row{
+    display:grid;
+    grid-template-columns:42px 1fr;
+    gap:16px;
+    align-items:start;
+    background:var(--panel-2);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .row .n{
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border-radius:9px;
+    width:42px;height:42px;
+    display:grid;place-items:center;
+    font-weight:600;
+  }
+  .row h3{font-size:14.5px;font-weight:650}
+  .row p{font-size:13.5px;color:var(--muted);margin-top:5px}
+  .row p b{color:var(--ink);font-weight:600}
+
+  /* pitfall: problem -> fix */
+  .pit{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0;
+    background:var(--panel-2);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .pit > div{padding:14px 18px}
+  .pit .bad{border-right:1px solid var(--border-soft)}
+  .pit .bad .lbl{color:var(--faint)}
+  .pit .fix{background:var(--panel-3)}
+  .pit .fix .lbl{color:var(--accent)}
+  .pit .lbl{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
+    display:flex;align-items:center;gap:7px;margin-bottom:7px;
+  }
+  .pit h3{font-size:13.5px;font-weight:650}
+  .pit p{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .pit-wrap{margin-top:26px;display:flex;flex-direction:column;gap:11px}
+
+  /* loop diagram */
+  .diagram{margin-top:30px;display:flex;justify-content:center}
+  .flowmap{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;
+    margin-top:26px;
+  }
+  .stagebox{
+    flex:1 1 140px;
+    background:var(--panel-2);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-sm);
+    padding:14px;
+    position:relative;
+  }
+  .stagebox .s-en{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.08em}
+  .stagebox h4{font-size:14px;font-weight:650;margin-top:5px}
+  .stagebox p{font-size:12px;color:var(--muted);margin-top:5px}
+  .arrowrow{display:flex;align-items:center;color:var(--faint);font-size:18px;flex:none}
+
+  /* augmented LLM diagram */
+  .aug{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    align-items:center;
+  }
+  .aug .core{
+    grid-column:2;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:22px;text-align:center;
+  }
+  .aug .core b{display:block;font-size:18px;letter-spacing:-0.01em}
+  .aug .core span{font-family:var(--mono);font-size:11px;color:var(--accent)}
+  .aug .node{
+    background:var(--panel-2);border:1px solid var(--border-soft);
+    border-radius:var(--radius-sm);padding:15px;text-align:center;
+  }
+  .aug .node i{font-size:22px;color:var(--accent);display:block;margin-bottom:7px}
+  .aug .node b{font-size:13.5px;font-weight:600}
+  .aug .node span{font-size:12px;color:var(--muted);display:block;margin-top:3px}
+
+  /* cover */
+  .cover{display:flex;flex-direction:column;justify-content:center;min-height:calc(100dvh - 67px);padding-top:0}
+  .cover .big{
+    font-size:clamp(34px,6vw,68px);
+    line-height:1.02;
+    letter-spacing:-0.035em;
+    font-weight:800;
+    margin:20px 0 0;
+  }
+  .cover .big em{font-style:normal;color:var(--accent)}
+  .cover .sub{font-size:17px;color:var(--muted);max-width:54ch;margin-top:22px}
+  .badges{display:flex;flex-wrap:wrap;gap:9px;margin-top:30px}
+  .badge{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.04em;
+    color:var(--muted);
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    border-radius:99px;padding:7px 13px;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .badge i{color:var(--accent)}
+  .hint{
+    margin-top:34px;font-size:13px;color:var(--faint);
+    display:inline-flex;align-items:center;gap:9px;
+  }
+  .keycap{
+    font-family:var(--mono);font-size:11px;color:var(--ink);
+    border:1px solid var(--border);border-bottom-width:2px;
+    background:var(--panel-2);border-radius:6px;padding:2px 7px;
+  }
+
+  /* sources list */
+  .srclist{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+  .srcrow{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--panel-2);border:1px solid var(--border-soft);
+    border-radius:var(--radius);padding:15px 18px;
+  }
+  .srcrow i{color:var(--accent);font-size:18px;margin-top:2px;flex:none}
+  .srcrow h3{font-size:14px;font-weight:650}
+  .srcrow .u{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px;word-break:break-all}
+  .note{margin-top:22px;font-size:12.5px;color:var(--faint);max-width:60ch}
+
+  .pull{
+    margin-top:24px;border-left:2px solid var(--accent);
+    padding:4px 0 4px 18px;color:var(--ink);font-size:15px;max-width:58ch;
+  }
+  .pull span{color:var(--faint);font-size:12.5px;font-family:var(--mono);display:block;margin-top:8px}
+
+  /* mobile */
+  .menu-toggle{display:none}
+  .scrim{display:none}
+
+  @media (max-width:880px){
+    body{overflow:auto}
+    .app{grid-template-columns:1fr;height:auto}
+    .sidebar{
+      position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:40;
+      transform:translateX(-102%);transition:transform .26s var(--ease);
+      height:100dvh;
+    }
+    .app.menu-open .sidebar{transform:none}
+    .scrim{
+      display:block;position:fixed;inset:0;background:rgba(8,9,12,0.6);
+      z-index:30;opacity:0;pointer-events:none;transition:opacity .2s var(--ease);
+    }
+    .app.menu-open .scrim{opacity:1;pointer-events:auto}
+    .stage{min-height:100dvh}
+    .topbar{padding:12px 16px;position:sticky;top:0;background:var(--canvas);z-index:20}
+    .menu-toggle{
+      display:grid;place-items:center;width:38px;height:38px;flex:none;
+      border:1px solid var(--border);background:var(--panel-2);color:var(--ink);
+      border-radius:var(--radius-sm);font-size:18px;cursor:pointer;
+    }
+    .slide{padding:30px 18px 56px}
+    .cover{min-height:auto;padding-top:18px}
+    .g3,.g2,.aug{grid-template-columns:1fr}
+    .aug .core{grid-column:1}
+    .pit{grid-template-columns:1fr}
+    .pit .bad{border-right:none;border-bottom:1px solid var(--border-soft)}
+    .row{grid-template-columns:36px 1fr;gap:12px}
+    .row .n{width:36px;height:36px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="kick">AI 코딩 에이전트 · 2026</div>
+      <h1>루프 &amp; 하네스 엔지니어링</h1>
+      <p>처음 듣는 사람을 위한 슬라이드 가이드</p>
+    </div>
+    <nav class="toc" aria-label="목차">
+      <div class="toc-label">목차</div>
+      <ol id="toc"></ol>
+    </nav>
+    <div class="side-foot">
+      검증: 3표 적대적 팩트체크<br>
+      근거: <b>Anthropic</b> · <b>superloop</b>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="목차 열기"><i class="ph ph-list"></i></button>
+      <div class="progress" role="presentation"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="counter"><b id="cur">01</b> / <span id="total">12</span></div>
+      <div class="nav-btns">
+        <button class="nav-btn" id="prevBtn" aria-label="이전 슬라이드"><i class="ph ph-arrow-left"></i></button>
+        <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드"><i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <div class="deck" id="deck" tabindex="-1" aria-live="polite">
+
+      <!-- 00 COVER -->
+      <section class="slide active" data-title="표지" aria-roledescription="슬라이드" aria-label="표지">
+        <div class="cover">
+          <div class="kick">초보자 가이드</div>
+          <h1 class="big">에이전트를 <em>루프</em>로<br>일하게 만드는 법</h1>
+          <p class="sub">한 번 답하고 끝나는 챗봇이 아니라, 스스로 도구를 들고 여러 번 판단하며 일을 끝내는 에이전트. 그 뒤를 받치는 두 기둥이 <strong style="color:var(--ink)">루프</strong>와 <strong style="color:var(--ink)">하네스</strong>입니다.</p>
+          <div class="badges">
+            <span class="badge"><i class="ph ph-check-circle"></i> Anthropic 엔지니어링 검증 사실</span>
+            <span class="badge"><i class="ph ph-terminal-window"></i> superloop 실사례</span>
+            <span class="badge"><i class="ph ph-graduation-cap"></i> 사전 지식 불필요</span>
+          </div>
+          <div class="hint"><span class="keycap">&larr;</span><span class="keycap">&rarr;</span> 방향키 또는 좌측 목차로 이동</div>
+        </div>
+      </section>
+
+      <!-- 01 WHY -->
+      <section class="slide" data-title="왜 지금 유행인가" aria-roledescription="슬라이드" aria-label="왜 지금 유행인가">
+        <div class="kick">왜 지금인가</div>
+        <h2>프롬프트에서 하네스로</h2>
+        <p class="lead">좋은 문장 하나를 다듬던 <strong>프롬프트 엔지니어링</strong>의 시대에서, 에이전트가 도구를 들고 여러 차례 스스로 판단하게 설계하는 <strong>하네스 / 컨텍스트 엔지니어링</strong>으로 무게중심이 옮겨갔습니다.</p>
+        <div class="grid g3">
+          <div class="card">
+            <div class="ic"><i class="ph ph-robot"></i></div>
+            <h3>에이전트의 정의</h3>
+            <p>Anthropic은 에이전트를 <b>"도구를 루프로 자율 사용하는 LLM"</b>으로 정의합니다. 명령에서 출발해 스스로 계획하고 움직입니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-arrows-clockwise"></i></div>
+            <h3>한 번이 아니라 반복</h3>
+            <p>일은 한 번의 응답이 아니라 <b>여러 컨텍스트 창에 걸친 루프</b>로 진행됩니다. 긴 작업일수록 더 그렇습니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-wrench"></i></div>
+            <h3>설계가 곧 성능</h3>
+            <p>그래서 모델 자체만큼 <b>"어떻게 시키느냐(하네스)"</b>가 결과를 좌우합니다. 이것이 지금의 화두입니다.</p>
+          </div>
+        </div>
+        <p class="src">출처: <i>Anthropic</i>, Building effective agents · Effective context engineering for AI agents</p>
+      </section>
+
+      <!-- 02 VOCAB -->
+      <section class="slide" data-title="핵심 용어 3개" aria-roledescription="슬라이드" aria-label="핵심 용어 3개">
+        <div class="kick">먼저 단어 3개</div>
+        <h2>루프, 하네스, 그리고 에이전트</h2>
+        <p class="lead">헷갈리는 세 단어를 먼저 정리합니다. 이 셋만 잡으면 나머지는 따라옵니다.</p>
+        <div class="grid g3">
+          <div class="card">
+            <span class="tag">01 · Agent</span>
+            <h3 style="margin-top:10px">에이전트</h3>
+            <p>도구를 <b>루프로 자율 사용</b>하는 LLM. 각 상호작용이 다음 판단의 맥락이 됩니다(점진적 공개, progressive disclosure).</p>
+          </div>
+          <div class="card">
+            <span class="tag">02 · Loop</span>
+            <h3 style="margin-top:10px">에이전틱 루프</h3>
+            <p>모델이 <b>도구를 쓰고 → 결과(환경 피드백)를 보고 → 다음 행동을 정하는</b> 반복. 본질은 "도구 + 피드백의 반복"입니다.</p>
+          </div>
+          <div class="card">
+            <span class="tag">03 · Harness</span>
+            <h3 style="margin-top:10px">하네스</h3>
+            <p>그 루프를 감싸는 <b>범용 비계(scaffolding)</b>. 모델을 여러 컨텍스트 창에 걸쳐 루프로 돌려 장기 작업을 수행합니다(예: Claude Agent SDK).</p>
+          </div>
+        </div>
+        <div class="pull">루프는 엔진, 하네스는 그 엔진을 안전하게 오래 돌리는 차체입니다.<span>비유로 기억하면 헷갈리지 않습니다.</span></div>
+      </section>
+
+      <!-- 03 AUGMENTED LLM -->
+      <section class="slide" data-title="기본 블록: Augmented LLM" aria-roledescription="슬라이드" aria-label="기본 블록 Augmented LLM">
+        <div class="kick">기본 블록</div>
+        <h2>모든 하네스의 최소 단위</h2>
+        <p class="lead">복잡해 보여도 출발점은 하나입니다. 바로 <strong>증강된 LLM(augmented LLM)</strong>: 검색·도구·메모리를 갖추고, 그것들을 <strong>모델이 직접 제어</strong>하는 단위입니다.</p>
+        <div class="aug">
+          <div class="node"><i class="ph ph-magnifying-glass"></i><b>검색 Retrieval</b><span>필요한 정보를 질의해 가져옴</span></div>
+          <div class="core"><span>CORE</span><b>증강된 LLM</b><p style="font-size:12.5px;color:var(--muted);margin-top:8px">질의를 만들고, 도구를 고르고,<br>무엇을 기억할지 스스로 결정</p></div>
+          <div class="node"><i class="ph ph-wrench"></i><b>도구 Tools</b><span>환경과 상호작용하는 손발</span></div>
+          <div class="node" style="grid-column:2"><i class="ph ph-brain"></i><b>메모리 Memory</b><span>맥락을 넘어 기억을 유지</span></div>
+        </div>
+        <p class="src">출처: <i>Anthropic</i>, Building effective agents (the "augmented LLM" building block)</p>
+      </section>
+
+      <!-- 04 ANATOMY -->
+      <section class="slide" data-title="루프 한 바퀴(틱)" aria-roledescription="슬라이드" aria-label="루프 한 바퀴">
+        <div class="kick">루프 한 바퀴 = 틱(tick)</div>
+        <h2>한 사이클을 들여다보기</h2>
+        <p class="lead">루프 한 바퀴는 <strong>감지 → 사고 → 행동 → 관찰</strong>의 반복입니다. 매 단계는 환경에서 <strong>ground truth</strong>(도구 결과, 코드 실행)를 받아옵니다. 추측이 아니라 사실로 다음을 정합니다.</p>
+        <div class="flowmap">
+          <div class="stagebox"><div class="s-en">perceive</div><h4>감지</h4><p>현재 상태를 읽는다</p></div>
+          <div class="arrowrow"><i class="ph ph-arrow-right"></i></div>
+          <div class="stagebox"><div class="s-en">think</div><h4>사고</h4><p>다음 한 수를 정한다</p></div>
+          <div class="arrowrow"><i class="ph ph-arrow-right"></i></div>
+          <div class="stagebox"><div class="s-en">act</div><h4>행동</h4><p>도구로 변경을 가한다</p></div>
+          <div class="arrowrow"><i class="ph ph-arrow-right"></i></div>
+          <div class="stagebox"><div class="s-en">observe</div><h4>관찰</h4><p>결과를 확인하고 되돌아간다</p></div>
+        </div>
+        <p class="lead" style="margin-top:30px">실제 구현(<strong>superloop</strong>)에서는 한 틱이 이렇게 6단계로 펼쳐집니다:</p>
+        <div class="flowmap" style="margin-top:14px">
+          <div class="stagebox"><div class="s-en">ORIENT</div><p>원장·계약을 읽고 현실(git)과 대조</p></div>
+          <div class="stagebox"><div class="s-en">PICK</div><p>열린 작업 하나만 선택</p></div>
+          <div class="stagebox"><div class="s-en">EXECUTE</div><p>가장 작은 올바른 변경</p></div>
+          <div class="stagebox"><div class="s-en">VERIFY</div><p>진짜 테스트·빌드·응답으로 확인</p></div>
+          <div class="stagebox"><div class="s-en">RECORD</div><p>추가 전용 로그에 증거와 함께 기록</p></div>
+          <div class="stagebox"><div class="s-en">PACE</div><p>캐시를 아끼는 간격으로 다음 틱</p></div>
+        </div>
+        <p class="src">출처: <i>superloop</i> SKILL.md (tick anatomy)</p>
+      </section>
+
+      <!-- 05 CONTEXT -->
+      <section class="slide" data-title="컨텍스트 엔지니어링" aria-roledescription="슬라이드" aria-label="컨텍스트 엔지니어링">
+        <div class="kick">컨텍스트 엔지니어링</div>
+        <h2>컨텍스트는 유한한 자원</h2>
+        <p class="lead"><strong>컨텍스트 엔지니어링</strong>이란 추론 중 "최적의 토큰 집합"을 큐레이션하고 유지하는 전략입니다. 프롬프트 엔지니어링의 자연스러운 다음 단계로 불립니다.</p>
+        <div class="grid g3">
+          <div class="card">
+            <div class="ic"><i class="ph ph-wind"></i></div>
+            <h3>컨텍스트 로트</h3>
+            <p>토큰이 늘수록 <b>그 안의 정보를 정확히 회상하는 능력은 떨어집니다</b>. 길다고 좋은 게 아닙니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-gauge"></i></div>
+            <h3>주의 예산</h3>
+            <p>모델은 한정된 <b>attention budget</b>을 가집니다. 새 토큰 하나하나가 그 예산을 깎습니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-floppy-disk"></i></div>
+            <h3>영속 상태</h3>
+            <p>진행 파일(예: progress.txt) + git 히스토리로 상태를 <b>디스크에 남겨야</b> 새 컨텍스트가 복구합니다.</p>
+          </div>
+        </div>
+        <div class="pull">상태를 매번 요약(compaction)하는 것만으로는 부족합니다. 새 에이전트가 빠르게 "지금까지의 작업"을 이해할 길이 따로 필요합니다.<span>출처: Anthropic, Effective harnesses for long-running agents</span></div>
+      </section>
+
+      <!-- 06 COMPONENTS -->
+      <section class="slide" data-title="하네스 구성요소" aria-roledescription="슬라이드" aria-label="하네스 구성요소">
+        <div class="kick">부품 목록</div>
+        <h2>하네스를 이루는 6가지</h2>
+        <p class="lead">튼튼한 하네스는 다음 부품의 조합입니다. 처음엔 전부 갖출 필요 없이, 검증과 상한부터 챙기면 됩니다.</p>
+        <div class="grid g3">
+          <div class="card"><div class="ic"><i class="ph ph-wrench"></i></div><h3>도구 호출</h3><p>모델이 환경과 상호작용하는 손과 발. 함수 호출로 읽고 쓰고 실행합니다.</p></div>
+          <div class="card"><div class="ic"><i class="ph ph-shield-check"></i></div><h3>검증 게이트</h3><p>테스트·브라우저로 "정말 됐는지" 확인. <b>없으면 모델은 안 된 것도 완료로 표시</b>합니다.</p></div>
+          <div class="card"><div class="ic"><i class="ph ph-coins"></i></div><h3>예산 상한</h3><p>max_ticks 같은 하드 실링으로 <b>폭주를 막습니다</b>. 상한은 실패가 아니라 안전장치입니다.</p></div>
+          <div class="card"><div class="ic"><i class="ph ph-arrow-counter-clockwise"></i></div><h3>재시도 + 백오프</h3><p>일시 실패만, 지수 백오프로, 횟수 상한 안에서. 영구 오류(400/404)는 재시도하지 않습니다.</p></div>
+          <div class="card"><div class="ic"><i class="ph ph-floppy-disk"></i></div><h3>영속 상태</h3><p>컨텍스트 창을 넘어 상태를 보존. 파일 + git이 가장 단순하고 튼튼한 방법입니다.</p></div>
+          <div class="card"><div class="ic"><i class="ph ph-git-branch"></i></div><h3>격리</h3><p>worktree·샌드박스로 동시 작업이 서로 충돌하지 않게 분리합니다.</p></div>
+        </div>
+      </section>
+
+      <!-- 07 IN THE WILD -->
+      <section class="slide" data-title="실제 시스템 사례" aria-roledescription="슬라이드" aria-label="실제 시스템 사례">
+        <div class="kick">실전에서는</div>
+        <h2>실제로는 이렇게 생겼다</h2>
+        <p class="lead">추상적인 개념이 실제 도구에서 어떻게 구현되는지 세 가지로 봅니다.</p>
+        <div class="grid g3">
+          <div class="card">
+            <div class="ic"><i class="ph ph-terminal-window"></i></div>
+            <h3>Claude Code</h3>
+            <p>맥락 수집 → 행동 → 결과 검증을 반복하는 코딩 에이전트 루프. 게이트와 권한 모드가 행동을 감쌉니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-stack"></i></div>
+            <h3>장기 실행 하네스</h3>
+            <p><b>2-프롬프트 구조</b>: 첫 세션은 환경 셋업(init.sh, 진행 로그, 최초 git 커밋), 이후 세션은 점진 진행 + 다음 세션용 구조화된 업데이트를 남깁니다.</p>
+          </div>
+          <div class="card">
+            <div class="ic"><i class="ph ph-infinity"></i></div>
+            <h3>superloop (이 레포)</h3>
+            <p>틱(ORIENT..PACE) + 한 장짜리 <b>루프 계약</b> + 추가 전용 <b>원장</b> + 건너뛸 수 없는 합의 게이트.</p>
+          </div>
+        </div>
+        <p class="src">출처: <i>Anthropic</i>, Effective harnesses for long-running agents · <i>superloop</i> (this repo)</p>
+      </section>
+
+      <!-- 08 BEST PRACTICES -->
+      <section class="slide" data-title="베스트 프랙티스" aria-roledescription="슬라이드" aria-label="베스트 프랙티스">
+        <div class="kick">베스트 프랙티스</div>
+        <h2>튼튼한 루프의 여섯 규칙</h2>
+        <div class="rows">
+          <div class="row"><div class="n">1</div><div><h3>명시적 중단조건</h3><p>최대 반복 수 같은 <b>stopping condition</b>으로 폭주를 묶습니다. 통제를 유지하는 가장 기본.</p></div></div>
+          <div class="row"><div class="n">2</div><div><h3>검증을 강제한다</h3><p>E2E 테스트·브라우저 툴을 쥐여줘 <b>"완료" 자칭을 막습니다</b>. 이것만으로 성능이 크게 올랐습니다.</p></div></div>
+          <div class="row"><div class="n">3</div><div><h3>상태를 디스크에 남긴다</h3><p>진행 파일 + git으로 새 컨텍스트가 언제든 복구할 수 있게 합니다.</p></div></div>
+          <div class="row"><div class="n">4</div><div><h3>쓰기 주체는 하나(owns)</h3><p>자원마다 단 하나의 루프만 씁니다. 동시에 여러 루프를 안전하게 돌리는 비결.</p></div></div>
+          <div class="row"><div class="n">5</div><div><h3>점진적 자율성</h3><p>새 루프는 <b>report-only</b>로 시작해 제안만 하고, 신뢰가 쌓이면 <b>write</b>로 승격합니다.</p></div></div>
+          <div class="row"><div class="n">6</div><div><h3>예산 실링</h3><p>"주말 사이 400달러" 같은 사고를 막는 누적 상한. 상한에 닿으면 깔끔히 멈추고 보고합니다.</p></div></div>
+        </div>
+        <p class="src">출처: <i>Anthropic</i>, Building effective agents · Effective harnesses · <i>superloop</i> loop-contract</p>
+      </section>
+
+      <!-- 09 PITFALLS -->
+      <section class="slide" data-title="흔한 함정" aria-roledescription="슬라이드" aria-label="흔한 함정">
+        <div class="kick">함정과 처방</div>
+        <h2>자주 밟는 다섯 지뢰</h2>
+        <p class="lead">대부분의 루프 사고는 새로운 게 아니라, 아래 다섯 가지의 반복입니다. 왼쪽은 증상, 오른쪽은 처방입니다.</p>
+        <div class="pit-wrap">
+          <div class="pit">
+            <div class="bad"><div class="lbl"><i class="ph ph-warning"></i> 함정</div><h3>무한 재시도</h3><p>5xx 응답에 영원히 재시도하며 주말 내내 같은 실패를 갈아댑니다.</p></div>
+            <div class="fix"><div class="lbl"><i class="ph ph-check"></i> 처방</div><h3>횟수 상한 + 지수 백오프</h3><p>재시도는 일시 실패에만, 약 3회까지. 멱등 연산에만.</p></div>
+          </div>
+          <div class="pit">
+            <div class="bad"><div class="lbl"><i class="ph ph-warning"></i> 함정</div><h3>컨텍스트 폭주</h3><p>토큰이 가득 차며 회상이 무너지고 출력이 엉킵니다.</p></div>
+            <div class="fix"><div class="lbl"><i class="ph ph-check"></i> 처방</div><h3>영속 상태 + 큐레이션</h3><p>상태는 디스크에. 요약·서브에이전트로 필요한 토큰만 남깁니다.</p></div>
+          </div>
+          <div class="pit">
+            <div class="bad"><div class="lbl"><i class="ph ph-warning"></i> 함정</div><h3>stdin drain</h3><p>루프 안 자식 프로세스가 stdin을 통째로 먹어 첫 항목만 처리됩니다.</p></div>
+            <div class="fix"><div class="lbl"><i class="ph ph-check"></i> 처방</div><h3>자식에 입력을 끊기</h3><p>자식 명령에 <b>&lt;/dev/null</b>을 연결해 부모의 큐를 지킵니다.</p></div>
+          </div>
+          <div class="pit">
+            <div class="bad"><div class="lbl"><i class="ph ph-warning"></i> 함정</div><h3>게이트가 큐를 막음</h3><p>막힌 작업 한 건이 나머지 큐 전체를 멈춰 세웁니다.</p></div>
+            <div class="fix"><div class="lbl"><i class="ph ph-check"></i> 처방</div><h3>실패는 격리</h3><p>한 단위의 실패·게이트는 격리하고, 큐는 계속 흐르게 합니다.</p></div>
+          </div>
+          <div class="pit">
+            <div class="bad"><div class="lbl"><i class="ph ph-warning"></i> 함정</div><h3>set -e가 꺼진다</h3><p><b>func || rc=$?</b> 안에서는 -e가 꺼져 실패 단계가 조용히 반복됩니다.</p></div>
+            <div class="fix"><div class="lbl"><i class="ph ph-check"></i> 처방</div><h3>반환코드를 명시 검사</h3><p>실패 경로를 직접 확인하고, 함정마다 실패 테스트를 먼저 만듭니다.</p></div>
+          </div>
+        </div>
+        <p class="src">출처: <i>superloop</i> loop-runner-pitfalls.md · <i>Anthropic</i> (stopping conditions)</p>
+      </section>
+
+      <!-- 10 GET STARTED -->
+      <section class="slide" data-title="시작 5단계" aria-roledescription="슬라이드" aria-label="시작 5단계">
+        <div class="kick">오늘 시작하기</div>
+        <h2>첫 루프를 위한 5단계</h2>
+        <div class="rows">
+          <div class="row"><div class="n">1</div><div><h3>작은 루프를 read-only로</h3><p>읽고 <b>제안만</b> 하게 시작합니다. 모든 쓰기는 일단 게이트 뒤에 둡니다.</p></div></div>
+          <div class="row"><div class="n">2</div><div><h3>한 장짜리 계약을 쓴다</h3><p>범위·권한·예산·중단조건·보고처를 <b>한 페이지</b>에 고정합니다. 합의의 기준선.</p></div></div>
+          <div class="row"><div class="n">3</div><div><h3>검증을 코드로 만든다</h3><p>테스트·빌드·HTTP 응답·읽기전용 DB로 <b>"진짜 됐다"를 증명</b>합니다.</p></div></div>
+          <div class="row"><div class="n">4</div><div><h3>예산과 중단조건을 박는다</h3><p>max_ticks와 연속 실패 차단기로 폭주를 <b>미리 묶어</b> 둡니다.</p></div></div>
+          <div class="row"><div class="n">5</div><div><h3>신뢰가 쌓이면 write로</h3><p>일관되게 유용하면 report-only에서 write로 <b>승격</b>합니다. 아니면 다시 내립니다.</p></div></div>
+        </div>
+        <div class="pull">처음엔 능력보다 "읽기 쉬운 계약"이 신뢰를 만듭니다. 가장 많은 에이전트가 아니라, 가장 명료한 계약을 가진 팀이 이깁니다.<span>출처: superloop, loop-contract.md</span></div>
+      </section>
+
+      <!-- 11 SOURCES -->
+      <section class="slide" data-title="출처 · 더 읽기" aria-roledescription="슬라이드" aria-label="출처 더 읽기">
+        <div class="kick">출처 · 더 읽기</div>
+        <h2>여기서부터 깊이 파기</h2>
+        <div class="srclist">
+          <div class="srcrow"><i class="ph ph-article"></i><div><h3>Building effective agents</h3><div class="u">anthropic.com/research/building-effective-agents</div></div></div>
+          <div class="srcrow"><i class="ph ph-article"></i><div><h3>Effective context engineering for AI agents</h3><div class="u">anthropic.com/engineering/effective-context-engineering-for-ai-agents</div></div></div>
+          <div class="srcrow"><i class="ph ph-article"></i><div><h3>Effective harnesses for long-running agents</h3><div class="u">anthropic.com/engineering/effective-harnesses-for-long-running-agents</div></div></div>
+          <div class="srcrow"><i class="ph ph-git-branch"></i><div><h3>실사례: superloop-skill (이 레포)</h3><div class="u">SKILL.md · reference/loop-contract.md · reference/loop-runner-pitfalls.md</div></div></div>
+        </div>
+        <p class="note">이 가이드의 핵심 주장은 검색 후 3표 적대적 검증(2/3 이상 반박 시 폐기)을 통과한 항목만 실었습니다. 일부는 검증 미완으로 의도적으로 제외했습니다.</p>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var tocList = document.getElementById('toc');
+  var fill = document.getElementById('progressFill');
+  var curEl = document.getElementById('cur');
+  var totalEl = document.getElementById('total');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var app = document.getElementById('app');
+  var menuToggle = document.getElementById('menuToggle');
+  var scrim = document.getElementById('scrim');
+  var index = 0;
+  var n = slides.length;
+  totalEl.textContent = String(n).padStart(2,'0');
+
+  // build TOC
+  slides.forEach(function(s, i){
+    var li = document.createElement('li');
+    var btn = document.createElement('button');
+    btn.className = 'toc-item';
+    btn.type = 'button';
+    btn.innerHTML = '<span class="num">'+String(i).padStart(2,'0')+'</span><span>'+(s.getAttribute('data-title')||('슬라이드 '+i))+'</span>';
+    btn.addEventListener('click', function(){ go(i); closeMenu(); });
+    li.appendChild(btn);
+    tocList.appendChild(li);
+  });
+  var tocBtns = Array.prototype.slice.call(tocList.querySelectorAll('.toc-item'));
+
+  function go(i){
+    if(i < 0) i = 0;
+    if(i > n-1) i = n-1;
+    slides[index].classList.remove('active');
+    slides[i].classList.add('active');
+    tocBtns[index].setAttribute('aria-current','false');
+    tocBtns[i].setAttribute('aria-current','true');
+    index = i;
+    fill.style.width = ((i+1)/n*100) + '%';
+    curEl.textContent = String(i+1).padStart(2,'0');
+    prevBtn.disabled = (i === 0);
+    nextBtn.disabled = (i === n-1);
+    deck.scrollTop = 0;
+    if(history.replaceState) history.replaceState(null,'','#'+i);
+    tocBtns[i].scrollIntoView({block:'nearest'});
+  }
+
+  function closeMenu(){ app.classList.remove('menu-open'); if(menuToggle) menuToggle.setAttribute('aria-label','목차 열기'); }
+  function toggleMenu(){ app.classList.toggle('menu-open'); }
+
+  prevBtn.addEventListener('click', function(){ go(index-1); });
+  nextBtn.addEventListener('click', function(){ go(index+1); });
+  if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
+  if(scrim) scrim.addEventListener('click', closeMenu);
+
+  document.addEventListener('keydown', function(e){
+    if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    switch(e.key){
+      case 'ArrowRight': case 'PageDown': go(index+1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'PageUp': go(index-1); e.preventDefault(); break;
+      case 'Home': go(0); e.preventDefault(); break;
+      case 'End': go(n-1); e.preventDefault(); break;
+      case 'Escape': closeMenu(); break;
+    }
+  });
+
+  // deep-link on load
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  if(!isNaN(start) && start >=0 && start < n){ go(start); } else { go(0); }
+})();
+</script>
+</body>
+</html>

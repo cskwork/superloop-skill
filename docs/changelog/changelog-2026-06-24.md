@@ -95,3 +95,34 @@ ORIENT..PACE로, task status를 ledger queue 상태에 매핑). emit 기본 ON, 
 ## 범위 밖 (후속)
 - 실 무인 루프에서 board 자동시작(tmux 분할)의 현장 검증 — 코드 경로는 무비용 스모크로 확인했으나
   사용자 tmux 환경의 자동 렌더는 실사용에서 확인 권장.
+
+---
+
+## 부록: 루프/하네스 입문 가이드 (docs/loop-harness-guide.html)
+
+### 배경
+"요즘 유행인 루프/하네스 엔지니어링"을 초보자에게 설명하는 단일 HTML 가이드 요청.
+deep-research 하네스(검색 fan-out → 소스 fetch → 3표 적대적 검증)로 사실을 모은 뒤
+superdesign 스킬로 빌드했다. 근거는 두 갈래로 한정: Anthropic 엔지니어링 블로그 3편의
+3-0(만장) 검증 통과 주장 + 이 레포(superloop) 자체의 구현 문서.
+
+### 산출물
+- `docs/loop-harness-guide.html` (단일 자체완결, 약 40KB).
+- 레이아웃: 사용자 명시 요구대로 좌측 클릭형 목차 + 우측 인덱스 기반 슬라이드 12장
+  (이전/다음 버튼 + 방향키 ←/→/Home/End + 진행바 + 카운터 + 딥링크 #index + 모바일 드로어).
+- 내용 흐름: 표지 → 왜 지금 → 용어 3개(agent/loop/harness) → augmented LLM →
+  틱 해부(perceive..observe ↔ superloop ORIENT..PACE) → 컨텍스트 엔지니어링(context rot/
+  attention budget/영속 상태) → 하네스 6부품 → 실제 시스템(Claude Code/2-prompt 하네스/superloop)
+  → 베스트 프랙티스 6 → 함정 5(무한 재시도/컨텍스트 폭주/stdin drain/gate-blocks-queue/set -e off)
+  → 시작 5단계 → 출처.
+
+### 디자인 결정 (대안 기각 포함)
+- dark-tech/에디토리얼, 단일 앰버 액센트(AI-퍼플 기각: 슬롭 신호), Pretendard + 시스템 모노.
+  다이얼 VAR 4 / MOT 3 / DEN 4 — 2026 dev-docs 트렌드(연출 < 명료성)에 맞춰 절제.
+- 스크롤 리스너 0: 슬라이드는 인덱스 기반 전환만 사용(스크롤 기반 상태 갱신 함정 회피).
+- 사진 이미지 의도적 배제: 추상 시스템 주제에선 장식 슬롭. 정보성 도식/플로우맵만.
+- 검증: superdesign 정적 게이트 통과 — anti-slop PASS, 대비 18쌍 전부 WCAG AA 이상.
+  렌더는 사용자가 브라우저에서 직접 확인.
+- 발견: 좋은 1차 자료가 외부가 아니라 이 레포 안에 있었다. 함정 5종은 reference/
+  loop-runner-pitfalls.md, 틱/계약은 SKILL.md·loop-contract.md를 그대로 인용.
+- 랜딩(docs/index.html) 내비에 "입문 가이드" 링크 1개만 외과적 추가(녹색 테마는 불변).
