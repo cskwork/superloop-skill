@@ -5,14 +5,11 @@ description: Use when a /loop should hold an orchestrator's delivery to its inte
 
 # /superloop - hold an orchestrator's delivery to its intent
 
-/loop gives you a heartbeat; superloop gives each beat an acceptance loop that supervises the
-build. An orchestrator (supergoal, or an oh-my-symphony multi-agent swarm) declares a feature, bug
-fix, or greenfield task "done" - superloop holds that delivery to its **original intent**: full QA
-of every feature, tests pass, architecture correct.
-
-It verifies against the intent, not merely the tests that ship with it; when it finds a gap it does
-not fix silently - it **directs** the orchestrator with an evidence-backed fix directive, then
-re-verifies with fresh context next tick, converging once every requirement has a proof. State
+/loop gives you a heartbeat; superloop makes each beat an acceptance loop that supervises the build.
+An orchestrator (supergoal, or an oh-my-symphony multi-agent swarm) declares a feature, bug fix, or
+greenfield task "done"; superloop holds that delivery to its **original intent** - full QA of every
+feature, tests pass, architecture correct. A gap becomes an evidence-backed **fix directive** to the
+orchestrator, re-verified with fresh context next tick, until every requirement has a proof. State
 survives compaction because it lives in the ledger, not in context.
 
 **Invocation.**
@@ -32,15 +29,11 @@ durable record; the Board is a live lens that never gates a tick (`reference/obs
 ## The verify mission
 
 superloop runs a single mission: `verify`. The unit-queue is not commits or files but the
-**acceptance criteria** derived from the delivered intent. ORIENT builds an **Intent Spec**
-(`templates/intent-spec.md`) from the original request/ticket, the orchestrator's own claims (what
-it says it built), and surfaced/implicit requirements (negative constraints, must-preserve
-invariants, non-goals); each clause becomes one criterion with a required proof type (test / build /
-HTTP body / DB read / architecture check). Full protocol: `reference/mission-verify.md`; fix
-dispatch: `reference/orchestrator-handoff.md`.
-
-Custom scope: text after `verify`, or a path to a criteria file, replaces the auto-derived source -
-same tick anatomy applies. Ledger: `.superloop/verify/ledger.md`.
+**acceptance criteria** derived from the delivered intent - each a clause of an **Intent Spec**
+(`templates/intent-spec.md`) with a required proof type (test / build / HTTP body / DB read /
+architecture check). ORIENT builds the spec (below); full protocol: `reference/mission-verify.md`;
+fix dispatch: `reference/orchestrator-handoff.md`. Custom scope: text after `verify`, or a path to a
+criteria file, replaces the auto-derived source. Ledger: `.superloop/verify/ledger.md`.
 
 ## Core principles
 
@@ -65,11 +58,9 @@ same tick anatomy applies. Ledger: `.superloop/verify/ledger.md`.
   tests/spec) - superloop adds the loop contract and the directive, not a parallel methodology.
   Fixes land in a dedicated worktree (`reference/worktree.md`), never the working branch, merged
   back only after a green VERIFY plus consent.
-- **Converge or escalate.** Success is `all_criteria_proven`; escalation is
-  `orchestrator_cannot_close_gap` - see Convergence & stop below. A criterion without fresh
-  this-tick evidence is `unverified`, never `proven`.
-- **Ground truth per tick.** A tick without verification evidence (test run, build output, HTTP
-  response, read-only DB query) records `unverified`, never `proven`.
+- **Converge or escalate.** A criterion is `proven` only with fresh this-tick evidence (test run,
+  build output, HTTP response, read-only DB query); anything less is `unverified`. Stop conditions
+  in Convergence & stop below.
 
 ## Tick anatomy (every tick)
 
