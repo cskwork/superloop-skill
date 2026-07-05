@@ -14,18 +14,18 @@ write it, it didn't happen.**
 
 | Section | Holds |
 |---|---|
-| `## Contract` | the one-page loop contract, copied from `templates/contract.md` on the first tick (`reference/loop-contract.md`): trigger, scope, permissions, budget, stop, report, mode, owns. Read every ORIENT |
+| `## Contract` | the one-page loop contract, copied from `templates/contract.md` on the first tick (`reference/loop-contract.md`): intent, trigger, scope, permissions, budget, stop, report, mode, owns. Read every ORIENT |
 | `## Config` | mission, scope (paths/services/JQL), tick budget, autonomy notes, started date |
-| `## Cursor` | mission-specific progress marker: last verified SHA (`qa`), last doc sweep SHA (`docs`), current ticket + stage (`jira`), last scanned rev (`smells`) |
-| `## Queue` | units with status: `open` / `in-progress` / `done` / `blocked(reason)` / `awaiting-approval(what)` / `unverified` |
+| `## Cursor` | progress marker: the current criterion and the last `proven` criterion in the Intent Spec queue |
+| `## Queue` | acceptance criteria (from the Intent Spec) with status: `unverified` / `in-progress` / `proven` / `blocked(reason)` / `awaiting-approval(what)` |
 | `## Ticks` | append-only log: `#N <date> <unit> -> <result> (evidence: path)` ; one line per tick, including empty ticks |
-| `## Counters` | consecutive failures (per-unit and mission-wide), consecutive empty ticks, and **cumulative budget consumption**: ticks used (vs `budget.max_ticks`), files changed, ticks since last check-in |
+| `## Counters` | consecutive failures (per-unit and mission-wide), consecutive empty ticks, fix directives issued per criterion (vs the `orchestrator_cannot_close_gap` limit), and **cumulative budget consumption**: ticks used (vs `budget.max_ticks`), files changed, ticks since last check-in |
 
 ## Rules
 
 - **Append, don't rewrite.** `## Ticks` is append-only; statuses flip in place in `## Queue`.
-- **Idempotency by key.** Every unit has a stable key (SHA, ticket ID, file path, smell ID). PICK
-  skips keys already `done` - a re-fired tick after a crash must not redo finished work.
+- **Idempotency by key.** Every criterion has a stable key (its Intent Spec clause or index). PICK
+  skips keys already `proven` - a re-fired tick after a crash must not redo finished work.
 - **Reconcile at ORIENT.** Ledger says branch `fix/A20-999` but git says `aidt-prd`? Reality wins;
   log the drift as part of the tick and repair the queue before picking.
 - **Evidence is a pointer, not a paste.** Store command output in `evidence/` files; the ledger

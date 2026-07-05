@@ -10,18 +10,19 @@ first tick copies it into the ledger's `## Contract` section so every later tick
 context after compaction - reads the same rules. Fill it from the `/loop` invocation and the mission
 reference; do not leave a field blank.
 
-## The seven fields
+## The contract fields
 
 | Field | What it pins | Example |
 |---|---|---|
+| **intent** | The delivery under verification and where its acceptance criteria live (verify loops). | `templates/intent-spec.md`; PR #482 / ticket A20-812 |
 | **trigger** | What fires a tick: fixed interval, dynamic self-pace, or event-gated (Monitor). Mirrors the `/loop` launch. | `/loop 30m` ; `/loop` (dynamic) ; `Monitor on Jenkins deploy` |
 | **scope** | `include` / `exclude` - the paths, services, JQL, or branches the loop may read and touch. Everything outside is off-limits. | include `services/lms/**`; exclude `infra/`, vendored code |
 | **permissions** | What the loop may do **unattended** vs what **gates**. The gate list is the consent boundary (SKILL.md Safety rails). | unattended: read, test, build, local verify. gates: push/merge to shared branches, deploy, Jira writes, any data write |
 | **budget** | The hard ceilings that stop a runaway loop. See below. | `max_ticks: 50`, `checkin_every_n_ticks: 10` |
 | **stop** | The named conditions that end the loop (vs pause a unit). | queue empty 3 ticks; budget hit; mission-wide circuit breaker; mission complete |
 | **report** | Where results land. | tick-report to user each tick; ledger; `docs/changelog/`; Board |
-| **mode** | `report-only` or `write`. New or custom loops start `report-only` (read + propose, no writes); promote to `write` only after the signal is consistently useful. Built-in defaults: `docs`/`qa` are read-mostly, `smells`/`jira` are `write`. | `mode: report-only` |
-| **owns** | The writable resources this loop **exclusively owns** so concurrent loops never collide. Shared read is fine; shared write must be rare - one loop owns each writable thing. | owns: branch `fix/*`, the `jira` ledger, worktree `.superloop/jira/worktree` |
+| **mode** | `report-only` or `write`. New or custom loops start `report-only` (read + propose, no writes); promote to `write` only after the signal is consistently useful. The verify loop starts `report-only` and earns `write` to dispatch fixes. | `mode: report-only` |
+| **owns** | The writable resources this loop **exclusively owns** so concurrent loops never collide. Shared read is fine; shared write must be rare - one loop owns each writable thing. | owns: branch `fix/*`, the verify ledger, worktree `.superloop/verify/worktree` |
 
 ## Budget - hard ceilings (the "$400 overnight" guard)
 
@@ -52,6 +53,8 @@ mission reference lists its own; common ones:
 - `merge_conflict_requires_product_decision` - a conflict needing a human call -> escalate, don't guess.
 - `same_finding_seen_twice` - the same regression/smell resurfaces -> the approach is wrong; stop and report.
 - `green_signal_wrong_outcome` - checks pass but the real result is wrong -> escalate (see SKILL.md Escalation triggers).
+- `all_criteria_proven` - every acceptance criterion has fresh proof -> success stop; the verify loop is done.
+- `orchestrator_cannot_close_gap` - the same criterion fails after the fix-directive limit -> escalate, don't grind.
 
 A named stop is cheaper than the circuit breaker: it halts at the first principled signal, before
 three ticks of spend.
@@ -63,7 +66,7 @@ full tick anatomy but **proposes instead of writes** - it surfaces findings, dra
 doc, and records what it *would* do, gating every write as `awaiting-approval`. Promote it to
 `mode: write` only after the signal has been consistently useful for several ticks (the user flips
 the field in the ledger `## Contract`). Built-in defaults reflect this: `docs` and `qa` are
-read-mostly already; `smells` and `jira` are `write` but still gate every outward step.
+read-only, and the verify loop earns `write` to dispatch fixes but still gates every outward step.
 
 Demote the same way: if a `write` loop starts producing low-value or wrong changes, drop it back to
 `report-only` rather than stopping it - you keep the signal without the risk.
@@ -87,5 +90,7 @@ is the write space, and `owns` is the promise that nothing else writes there.
 ## Framing the loop's goal
 
 Write the goal as a moving target, not a one-shot fix. Not "fix this bug" but "keep this unit moving
-until it is either verified-done or blocked by a human decision." The contract's `stop` and
-`permissions` fields are what let the loop run that far unattended without overstepping.
+until it is either verified-done or blocked by a human decision." For the verify loop the target is
+`all_criteria_proven` - keep each acceptance criterion of the delivered intent moving until it is
+proven or escalated. The contract's `stop` and `permissions` fields are what let the loop run that
+far unattended without overstepping.

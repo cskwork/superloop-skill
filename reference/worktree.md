@@ -1,8 +1,8 @@
-# Worktree isolation - write missions get their own checkout
+# Worktree isolation - landed fixes get their own checkout
 
-Write missions (`smells`, `jira` from FIX on) **never mutate the working branch directly**. They work
-in a dedicated git worktree and merge back only after a green VERIFY and explicit consent. Read-only
-missions (`docs`, `qa`) need no worktree.
+The verify loop's fix dispatch (from the first fix directive on) **never mutates the working branch
+directly**. It works in a dedicated git worktree and merges back only after a green VERIFY and
+explicit consent. Verify-only ticks, with no fix landed, need no worktree.
 
 ## Why
 
@@ -27,20 +27,20 @@ worktree root resolves to its own path, so `sl-emit` reports it distinctly on th
 
 ## Lifecycle
 
-1. **Create** when the first write unit starts (smells: first fix; jira: BRANCH stage). `git worktree
-   add .superloop/<mission>/worktree <branch>` from the mission's verified base.
+1. **Create** when the first fix directive lands. `git worktree
+   add .superloop/verify/worktree <branch>` from the verified base.
 2. **Work** every tick inside that worktree - edits, tests, build, local verify all run there.
 3. **Reconcile at ORIENT.** Confirm the worktree exists and sits on the expected branch; if git
    disagrees (user removed it, branch moved), reality wins - repair or recreate before picking.
 4. **Merge** into the working or shared branch only after VERIFY is green **and** consent is given.
    Merging to a shared branch (`aidt-dev`, etc.) is already a consent gate (SKILL.md); the worktree
    does not change that - it just keeps the working branch clean until that gate passes.
-5. **Remove** the worktree (`git worktree remove`) once the unit/ticket is merged and `done`, so a
+5. **Remove** the worktree (`git worktree remove`) once the criterion's fix is merged and `proven`, so a
    stale checkout never lingers between loops.
 
 ## Failure / ownership notes
 
 - A worktree that can't be created (dirty path, git too old) -> mark the unit `blocked(worktree)` and
   escalate; do not silently fall back to editing the working branch.
-- One loop owns each worktree. A second loop on the same mission/repo must use a distinct worktree
+- One loop owns each worktree. A second loop on the same repo must use a distinct worktree
   path (or wait) - shared write is the thing isolation exists to prevent.
