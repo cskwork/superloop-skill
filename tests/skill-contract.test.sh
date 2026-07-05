@@ -73,6 +73,7 @@ require_text "failed criterion becomes a fix directive" "SKILL.md" "fix directiv
 require_file "orchestrator handoff reference exists" "reference/orchestrator-handoff.md"
 require_text "handoff referenced from SKILL" "SKILL.md" "reference/orchestrator-handoff.md"
 require_text "fix directive is evidence-backed" "reference/orchestrator-handoff.md" "fix directive"
+require_text "handoff offers the symphony dispatch path" "reference/orchestrator-handoff.md" "symphony"
 require_text "execution discipline delegates to supergoal" "SKILL.md" "supergoal"
 require_text "fixes isolate in a dedicated worktree" "SKILL.md" "dedicated worktree"
 require_text "fixes never touch the working branch directly" "SKILL.md" "never the working branch"

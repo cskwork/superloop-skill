@@ -35,12 +35,12 @@ worktree root resolves to its own path, so `sl-emit` reports it distinctly on th
 4. **Merge** into the working or shared branch only after VERIFY is green **and** consent is given.
    Merging to a shared branch (`aidt-dev`, etc.) is already a consent gate (SKILL.md); the worktree
    does not change that - it just keeps the working branch clean until that gate passes.
-5. **Remove** the worktree (`git worktree remove`) once the unit/ticket is merged and `done`, so a
+5. **Remove** the worktree (`git worktree remove`) once the criterion's fix is merged and `proven`, so a
    stale checkout never lingers between loops.
 
 ## Failure / ownership notes
 
 - A worktree that can't be created (dirty path, git too old) -> mark the unit `blocked(worktree)` and
   escalate; do not silently fall back to editing the working branch.
-- One loop owns each worktree. A second loop on the same mission/repo must use a distinct worktree
+- One loop owns each worktree. A second loop on the same repo must use a distinct worktree
   path (or wait) - shared write is the thing isolation exists to prevent.

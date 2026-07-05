@@ -35,8 +35,10 @@ Missing coverage on a risky path becomes a new failing-test criterion, not a sil
 
 ### direct shape (criterion failed)
 
-Emit a fix directive to the orchestrator - structure and dispatch paths in
-`reference/orchestrator-handoff.md`.
+Emit a fix directive to the orchestrator (structure and dispatch paths in
+`reference/orchestrator-handoff.md`), mark the criterion `in-progress`, and bump its fix-directive
+count in `## Counters`. At the `orchestrator_cannot_close_gap` limit (default 2), escalate instead of
+re-directing. A later tick re-verifies the `in-progress` criterion with fresh context.
 
 ## VERIFY
 
