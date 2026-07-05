@@ -20,8 +20,8 @@ reference; do not leave a field blank.
 | **budget** | The hard ceilings that stop a runaway loop. See below. | `max_ticks: 50`, `checkin_every_n_ticks: 10` |
 | **stop** | The named conditions that end the loop (vs pause a unit). | queue empty 3 ticks; budget hit; mission-wide circuit breaker; mission complete |
 | **report** | Where results land. | tick-report to user each tick; ledger; `docs/changelog/`; Board |
-| **mode** | `report-only` or `write`. New or custom loops start `report-only` (read + propose, no writes); promote to `write` only after the signal is consistently useful. Built-in defaults: `docs`/`qa` are read-mostly, `smells`/`jira` are `write`. | `mode: report-only` |
-| **owns** | The writable resources this loop **exclusively owns** so concurrent loops never collide. Shared read is fine; shared write must be rare - one loop owns each writable thing. | owns: branch `fix/*`, the `jira` ledger, worktree `.superloop/jira/worktree` |
+| **mode** | `report-only` or `write`. New or custom loops start `report-only` (read + propose, no writes); promote to `write` only after the signal is consistently useful. The verify loop starts `report-only` and earns `write` to dispatch fixes. | `mode: report-only` |
+| **owns** | The writable resources this loop **exclusively owns** so concurrent loops never collide. Shared read is fine; shared write must be rare - one loop owns each writable thing. | owns: branch `fix/*`, the verify ledger, worktree `.superloop/verify/worktree` |
 
 ## Budget - hard ceilings (the "$400 overnight" guard)
 
@@ -65,7 +65,7 @@ full tick anatomy but **proposes instead of writes** - it surfaces findings, dra
 doc, and records what it *would* do, gating every write as `awaiting-approval`. Promote it to
 `mode: write` only after the signal has been consistently useful for several ticks (the user flips
 the field in the ledger `## Contract`). Built-in defaults reflect this: `docs` and `qa` are
-read-mostly already; `smells` and `jira` are `write` but still gate every outward step.
+read-only, and the verify loop earns `write` to dispatch fixes but still gates every outward step.
 
 Demote the same way: if a `write` loop starts producing low-value or wrong changes, drop it back to
 `report-only` rather than stopping it - you keep the signal without the risk.

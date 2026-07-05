@@ -1,8 +1,8 @@
-# Worktree isolation - write missions get their own checkout
+# Worktree isolation - landed fixes get their own checkout
 
-Write missions (`smells`, `jira` from FIX on) **never mutate the working branch directly**. They work
-in a dedicated git worktree and merge back only after a green VERIFY and explicit consent. Read-only
-missions (`docs`, `qa`) need no worktree.
+The verify loop's fix dispatch (from the first fix directive on) **never mutates the working branch
+directly**. It works in a dedicated git worktree and merges back only after a green VERIFY and
+explicit consent. Verify-only ticks, with no fix landed, need no worktree.
 
 ## Why
 
@@ -27,8 +27,8 @@ worktree root resolves to its own path, so `sl-emit` reports it distinctly on th
 
 ## Lifecycle
 
-1. **Create** when the first write unit starts (smells: first fix; jira: BRANCH stage). `git worktree
-   add .superloop/<mission>/worktree <branch>` from the mission's verified base.
+1. **Create** when the first fix directive lands. `git worktree
+   add .superloop/verify/worktree <branch>` from the verified base.
 2. **Work** every tick inside that worktree - edits, tests, build, local verify all run there.
 3. **Reconcile at ORIENT.** Confirm the worktree exists and sits on the expected branch; if git
    disagrees (user removed it, branch moved), reality wins - repair or recreate before picking.
