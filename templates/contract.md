@@ -13,7 +13,7 @@
   - gates (consent required): <push/merge to shared branches, deploy, Jira transitions/comments, any data write, force ops>
 - **budget**:
   - max_ticks: <e.g. 50>
-  - max_files_per_unit: <e.g. 10>
+  - max_files_per_unit: <e.g. 10; 0 for a report-only verify loop - the orchestrator's fix touches files, the loop writes only .superloop/verify/>
   - max_runtime_per_tick: <e.g. 20m>
   - checkin_every_n_ticks: <e.g. 10>
   - max consecutive failures: 3 per-unit / 3 mission-wide

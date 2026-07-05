@@ -82,6 +82,11 @@ HTML 구조·CSS·이중언어(ko/en) 토글은 손대지 않고 카피만 교�
 - 최종 적대적 리뷰(critic 서브에이전트) 수행 - 계획 대비 스펙 준수·진실성·DRY·루프 건전성·
   테스트 적정성 5개 축 점검. CRITICAL 0건. 지적된 문서 진실성 결함(체인지로그·state-ledger의
   구 미션 잔재)은 리뷰 직후 이 브랜치에서 수정.
+- E2E 도그푸딩 - 씨앗 배송물(셔츠된 테스트 2/2 green이나 스펙 위반 내재)에 verify 루프를
+  fresh 컨텍스트로 1틱 실제 실행. 루프가 입력 변형·source 앨리어싱·배열 병합·undefined
+  덮어쓰기 4건(green_signal_wrong_outcome)을 잡고 report-only fix directive 발행, 소스 미수정.
+  스킬을 따라가며 발견한 사용성 결함(Intent Spec 출력 경로 미명시, 실패 기준 status 매핑,
+  첫 틱 스윕 예외, spec-silent degenerate 경계)을 mission-verify·contract 템플릿에 수정.
 - `grep -rn "mission-docs\|mission-smells\|mission-qa\|mission-jira\|/superloop qa\|
   /superloop jira\|/superloop docs\|/superloop smells" README.md README.ko.md
   docs/index.html` - 결과 없음(구 미션 잔재 0건).
