@@ -15,8 +15,8 @@
 # Pass --slot when several loops run in the SAME worktree+branch, to keep their files distinct.
 #
 # Usage (called by the loop itself at RECORD/PACE, once per tick):
-#   sl-emit --phase EXECUTE [--mode smells] [--task "A20-812: null guard"] \
-#           [--task-status in-progress] [--note "tick #7, 1 red open"] [--slot smells] \
+#   sl-emit --phase EXECUTE [--mode verify] [--task "A20-812: null guard"] \
+#           [--task-status in-progress] [--note "tick #7, 1 red open"] [--slot verify] \
 #           [--tasks-file board.json]   # full tasks[] array; else prior board is carried forward
 #
 #   --task-status maps the ledger queue status to a board column:

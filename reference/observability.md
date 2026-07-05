@@ -57,8 +57,8 @@ runs, so the moment anyone opens the board the full live state is there.
 ## Emitting - `templates/observability/sl-emit.sh`
 
 ```
-sl-emit --phase EXECUTE [--mode smells] [--task "A20-812: null guard"] \
-        [--task-status in-progress] [--note "tick #7, 1 red open"] [--slot smells] [--tasks-file board.json]
+sl-emit --phase EXECUTE [--mode verify] [--task "A20-812: null guard"] \
+        [--task-status in-progress] [--note "tick #7, 1 red open"] [--slot verify] [--tasks-file board.json]
 ```
 
 - **Opt-in:** emits only when `$REGDIR/.enabled` exists or `SUPERLOOP_TUI=1`. No Board => silent no-op.

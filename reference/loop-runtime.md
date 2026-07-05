@@ -1,7 +1,9 @@
 # Loop runtime - how /loop actually works (and how to drive it well)
 
 Distilled from the built-in `/loop` prompt, plus the pacing/Monitor practice superloop adds.
-Two modes: **fixed interval** (cron) and **dynamic** (self-paced via ScheduleWakeup).
+Two modes: **fixed interval** (cron) and **dynamic** (self-paced via ScheduleWakeup). The
+loop-as-routine model - trigger, scope, budget, stop, report - mirrors Codex routines; superloop's
+version of that contract lives in `reference/loop-contract.md`.
 
 ## Parsing `[interval] <prompt...>` (priority order)
 
@@ -46,7 +48,7 @@ Convert the interval, then call CronCreate with `recurring: true` and the parsed
      one it is the cadence (see pacing below)
    - `reason`: one short specific sentence
    - `prompt`: the full original /loop input verbatim, **prefixed with `/loop `** (e.g.
-     `/loop /superloop jira`) so the next fire re-enters the skill and continues the loop
+     `/loop /superloop verify`) so the next fire re-enters the skill and continues the loop
 5. **Woken by `<task-notification>`?** Handle the event in the loop's context, then call
    ScheduleWakeup again with the same prompt and the same 1200-1800s fallback - the Monitor stays
    the wake signal; this only resets the safety net.
@@ -78,17 +80,16 @@ whole conversation uncached.
 
 Bare `/loop` (no prompt) looks for a loop-tasks file at `.claude/loop.md` (project) or `~/.claude/loop.md`
 (capped at 25000 bytes) and runs its tasks each tick via a sentinel prompt that re-expands when the
-file is edited. To run superloop missions this way, list `/superloop <mission>` lines there - one
-mission per line, top line = highest priority.
+file is edited. To run the verify loop this way, put `/superloop verify` there.
 
 ## Launch recipes
 
 | Want | Type |
 |---|---|
-| QA every commit batch, office hours-ish | `/loop 30m /superloop qa` |
-| Work the Jira queue, event-driven | `/loop /superloop jira` (dynamic + Monitor on deploys) |
-| Nightly docs sweep | `/loop 1d /superloop docs` (or /schedule for a durable cloud routine) |
-| One tick right now | `/superloop smells` |
+| Verify a delivery every commit batch, office hours-ish | `/loop 30m /superloop verify` |
+| Verify an orchestrator's delivery, event-driven | `/loop /superloop verify` (dynamic + Monitor on CI/deploy) |
+| Nightly acceptance sweep | `/loop 1d /superloop verify` (or /schedule for a durable cloud routine) |
+| One acceptance tick right now | `/superloop verify` |
 
 Session-bound: /loop jobs die with the session and recurring jobs auto-expire after 7 days - for
 durable schedules point the user at /schedule.
