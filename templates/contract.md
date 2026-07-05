@@ -3,6 +3,7 @@
 <!-- Fill this before the first tick. The first tick copies it into the ledger ## Contract section.
      One page. No blank fields. Spec: reference/loop-contract.md. -->
 
+- **intent**: <the delivery under verification - request/ticket/PR; acceptance criteria in `templates/intent-spec.md`>
 - **trigger**: <fixed interval `/loop 30m` | dynamic `/loop` | event-gated Monitor on ...>
 - **scope**:
   - include: <paths / services / JQL / branches the loop may touch>
@@ -16,7 +17,7 @@
   - max_runtime_per_tick: <e.g. 20m>
   - checkin_every_n_ticks: <e.g. 10>
   - max consecutive failures: 3 per-unit / 3 mission-wide
-- **stop**: <queue empty 3 ticks | budget hit | mission-wide circuit breaker | mission complete>
+- **stop**: <all_criteria_proven | orchestrator_cannot_close_gap | queue empty 3 ticks | budget hit | circuit breaker>
 - **report**: <tick-report to user each tick; ledger; docs/changelog/; Board>
 - **mode**: <report-only | write>   <!-- new/custom loops start report-only -->
 - **owns**: <branches / ledger / worktree / file globs this loop exclusively writes>
