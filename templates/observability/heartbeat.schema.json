@@ -31,7 +31,7 @@
         "properties": {
           "id": { "type": "string" },
           "title": { "type": "string" },
-          "status": { "type": "string", "enum": ["backlog", "in-progress", "review", "done", "blocked"], "description": "Jira columns; ledger queue status maps here (open->backlog, awaiting-approval|unverified->review)" }
+          "status": { "type": "string", "enum": ["backlog", "in-progress", "review", "done", "blocked"], "description": "kanban columns; verify queue status maps here (unverified->backlog, awaiting-approval->review, proven->done)" }
         }
       }
     }

@@ -76,20 +76,23 @@ HTML 구조·CSS·이중언어(ko/en) 토글은 손대지 않고 카피만 교�
 
 - `for t in tests/*.test.sh; do bash "$t"; done` 재실행: loop-runtime 18 passed,
   observability 22 passed, skill-contract 64 passed - 전부 0 failed. 합산 104 passed.
-- `mission-jira-contract.test.sh`는 0 passed / 29 failed - 삭제된
-  `reference/mission-jira.md`를 참조하는 선재 결함(이번 변경으로 생긴 게 아니라, 이번
-  변경이 노출시킨 것). 테스트 파일 자체는 이번 작업 범위 밖("tests/* 손대지 않음")이라
-  방치 - 후속 항목으로 아래에 남긴다.
+- `tests/mission-jira-contract.test.sh` 삭제(커밋 `c5d5198`) - jira 미션이 사라졌으므로
+  그 파이프라인 테스트도 함께 제거. deploy-gate·동의·named stop 의미는
+  `reference/orchestrator-handoff.md`로 이전됐고 `skill-contract.test.sh`가 이를 고정한다.
+- 최종 적대적 리뷰(critic 서브에이전트) 수행 - 계획 대비 스펙 준수·진실성·DRY·루프 건전성·
+  테스트 적정성 5개 축 점검. CRITICAL 0건. 지적된 문서 진실성 결함(체인지로그·state-ledger의
+  구 미션 잔재)은 리뷰 직후 이 브랜치에서 수정.
 - `grep -rn "mission-docs\|mission-smells\|mission-qa\|mission-jira\|/superloop qa\|
   /superloop jira\|/superloop docs\|/superloop smells" README.md README.ko.md
   docs/index.html` - 결과 없음(구 미션 잔재 0건).
 - README.md/README.ko.md 대조 - Missions 표·구조 트리·Lineage 내용 일치 확인(README.ko.md는
   기존에도 없던 `## Tests` 절만 비대칭으로 유지 - 선재 상태, 범위 밖).
 
-## 범위 밖 (후속)
+## 후속 정리 (이 세션에서 완료)
 
-- `tests/mission-jira-contract.test.sh` 자체 수정 또는 삭제 - 이번 작업은 README/랜딩
-  3파일 + 체인지로그로 범위가 고정돼 있어 손대지 않았다. 다음 세션에서 처리 권장.
-- `reference/loop-contract.md`·`reference/observability.md`·`reference/worktree.md`에
-  남아있는 예시성 구 미션 이름(jira/smells 등) - 예시일 뿐 규범적 주장은 아니라 즉시
-  진실성 위반은 아니지만, verify 단일 미션 서사에 맞춰 정리하면 좋다.
+- `tests/mission-jira-contract.test.sh` 삭제(커밋 `c5d5198`).
+- `reference/{loop-contract,observability,worktree}.md`·`templates/observability/*`에 남아있던
+  예시성 구 미션 이름(jira/smells 등) 제거 - verify 단일 미션 서사와 일치(커밋 `c5d5198`).
+- 리뷰 후속(이 커밋): `reference/state-ledger.md`의 구 미션 어휘(`smell ID`/`done`) 정정,
+  계약 `intent` 필드를 loop-contract·ledger 템플릿·state-ledger로 전파, fix-directive 카운터와
+  `in-progress` 전이 명시, symphony 전달 경로 테스트 추가.

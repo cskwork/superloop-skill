@@ -2,9 +2,10 @@
 
 ## Contract
 <!-- Copied from templates/contract.md on the first tick. Read every ORIENT. Spec: reference/loop-contract.md -->
+- intent: <delivery under verification; acceptance criteria in templates/intent-spec.md>
 - trigger: <interval | dynamic | event-gated>
 - scope: include <...> / exclude <...>
-- permissions: unattended <...> / gates <push/merge/deploy/Jira/data writes>
+- permissions: unattended <...> / gates <push/merge/deploy/ticket/data writes>
 - budget: max_ticks <N> / max_files_per_unit <N> / max_runtime_per_tick <T> / checkin_every_n_ticks <N>
 - stop: <queue empty 3 ticks | budget hit | circuit breaker | mission complete>
 - report: tick-report + ledger + docs/changelog + Board
@@ -32,6 +33,7 @@
 - consecutive failures (mission-wide): 0
 - consecutive failures (current unit): 0
 - consecutive empty ticks: 0
+- fix directives issued (per criterion, vs orchestrator_cannot_close_gap limit): {}
 - ticks used (cumulative, vs budget.max_ticks): 0
 - files changed (cumulative): 0
 - ticks since last check-in (vs budget.checkin_every_n_ticks): 0

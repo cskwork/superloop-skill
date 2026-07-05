@@ -10,10 +10,11 @@ first tick copies it into the ledger's `## Contract` section so every later tick
 context after compaction - reads the same rules. Fill it from the `/loop` invocation and the mission
 reference; do not leave a field blank.
 
-## The seven fields
+## The contract fields
 
 | Field | What it pins | Example |
 |---|---|---|
+| **intent** | The delivery under verification and where its acceptance criteria live (verify loops). | `templates/intent-spec.md`; PR #482 / ticket A20-812 |
 | **trigger** | What fires a tick: fixed interval, dynamic self-pace, or event-gated (Monitor). Mirrors the `/loop` launch. | `/loop 30m` ; `/loop` (dynamic) ; `Monitor on Jenkins deploy` |
 | **scope** | `include` / `exclude` - the paths, services, JQL, or branches the loop may read and touch. Everything outside is off-limits. | include `services/lms/**`; exclude `infra/`, vendored code |
 | **permissions** | What the loop may do **unattended** vs what **gates**. The gate list is the consent boundary (SKILL.md Safety rails). | unattended: read, test, build, local verify. gates: push/merge to shared branches, deploy, Jira writes, any data write |
