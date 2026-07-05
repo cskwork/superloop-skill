@@ -12,21 +12,21 @@
 - owns: <branches / ledger / worktree / file globs this loop exclusively writes>
 
 ## Config
-- mission: <docs|smells|qa|jira|custom>
-- scope: <paths / services / JQL filter>
-- tick budget: one unit per tick
-- autonomy: consent required for push/merge/deploy/Jira transitions/data writes
+- mission: verify
+- scope: <the delivery under verification - paths / services / criteria source>
+- tick budget: one criterion per tick
+- autonomy: consent required for push/merge/deploy/ticket transitions/data writes
 - started: <YYYY-MM-DD>
 
 ## Cursor
-- <last verified SHA | current ticket + stage | last sweep SHA>: <value>
+- current criterion: <#> / last proven: <#>
 
 ## Queue
-<!-- key | summary | status: open / in-progress / done / blocked(reason) / awaiting-approval(what) / unverified -->
-- [ ] <key> - <summary> - open
+<!-- criterion | proof type | status: unverified / in-progress / proven / blocked(reason) / awaiting-approval(what) -->
+- [ ] <criterion> - <proof type> - unverified
 
 ## Ticks
-<!-- append-only: #N <date> <unit-key> -> <result> (evidence: .superloop/<mission>/evidence/...) -->
+<!-- append-only: #N <date> <criterion> -> <result> (evidence: .superloop/verify/evidence/...) -->
 
 ## Counters
 - consecutive failures (mission-wide): 0

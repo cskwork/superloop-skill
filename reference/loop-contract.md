@@ -52,6 +52,8 @@ mission reference lists its own; common ones:
 - `merge_conflict_requires_product_decision` - a conflict needing a human call -> escalate, don't guess.
 - `same_finding_seen_twice` - the same regression/smell resurfaces -> the approach is wrong; stop and report.
 - `green_signal_wrong_outcome` - checks pass but the real result is wrong -> escalate (see SKILL.md Escalation triggers).
+- `all_criteria_proven` - every acceptance criterion has fresh proof -> success stop; the verify loop is done.
+- `orchestrator_cannot_close_gap` - the same criterion fails after the fix-directive limit -> escalate, don't grind.
 
 A named stop is cheaper than the circuit breaker: it halts at the first principled signal, before
 three ticks of spend.
@@ -87,5 +89,7 @@ is the write space, and `owns` is the promise that nothing else writes there.
 ## Framing the loop's goal
 
 Write the goal as a moving target, not a one-shot fix. Not "fix this bug" but "keep this unit moving
-until it is either verified-done or blocked by a human decision." The contract's `stop` and
-`permissions` fields are what let the loop run that far unattended without overstepping.
+until it is either verified-done or blocked by a human decision." For the verify loop the target is
+`all_criteria_proven` - keep each acceptance criterion of the delivered intent moving until it is
+proven or escalated. The contract's `stop` and `permissions` fields are what let the loop run that
+far unattended without overstepping.

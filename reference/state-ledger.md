@@ -16,8 +16,8 @@ write it, it didn't happen.**
 |---|---|
 | `## Contract` | the one-page loop contract, copied from `templates/contract.md` on the first tick (`reference/loop-contract.md`): trigger, scope, permissions, budget, stop, report, mode, owns. Read every ORIENT |
 | `## Config` | mission, scope (paths/services/JQL), tick budget, autonomy notes, started date |
-| `## Cursor` | mission-specific progress marker: last verified SHA (`qa`), last doc sweep SHA (`docs`), current ticket + stage (`jira`), last scanned rev (`smells`) |
-| `## Queue` | units with status: `open` / `in-progress` / `done` / `blocked(reason)` / `awaiting-approval(what)` / `unverified` |
+| `## Cursor` | progress marker: the current criterion and the last `proven` criterion in the Intent Spec queue |
+| `## Queue` | acceptance criteria (from the Intent Spec) with status: `unverified` / `in-progress` / `proven` / `blocked(reason)` / `awaiting-approval(what)` |
 | `## Ticks` | append-only log: `#N <date> <unit> -> <result> (evidence: path)` ; one line per tick, including empty ticks |
 | `## Counters` | consecutive failures (per-unit and mission-wide), consecutive empty ticks, and **cumulative budget consumption**: ticks used (vs `budget.max_ticks`), files changed, ticks since last check-in |
 
