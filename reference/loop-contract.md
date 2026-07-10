@@ -14,7 +14,7 @@ reference; do not leave a field blank.
 
 | Field | What it pins | Example |
 |---|---|---|
-| **intent** | The delivery under verification and where its acceptance criteria live (verify loops). | `templates/intent-spec.md`; PR #482 / ticket A20-812 |
+| **intent** | Verify: delivered intent and acceptance criteria. Deliver: frozen project brief and Frontier Map. | `templates/intent-spec.md`; `.superloop/deliver/project-brief.md` |
 | **trigger** | What fires a tick: fixed interval, dynamic self-pace, or event-gated (Monitor). Mirrors the `/loop` launch. | `/loop 30m` ; `/loop` (dynamic) ; `Monitor on Jenkins deploy` |
 | **scope** | `include` / `exclude` - the paths, services, JQL, or branches the loop may read and touch. Everything outside is off-limits. | include `services/lms/**`; exclude `infra/`, vendored code |
 | **permissions** | What the loop may do **unattended** vs what **gates**. The gate list is the consent boundary (SKILL.md Safety rails). | unattended: read, test, build, local verify. gates: push/merge to shared branches, deploy, Jira writes, any data write |
@@ -23,6 +23,33 @@ reference; do not leave a field blank.
 | **report** | Where results land. | tick-report to user each tick; ledger; `docs/changelog/`; Board |
 | **mode** | `report-only` or `write`. New or custom loops start `report-only` (read + propose, no writes); promote to `write` only after the signal is consistently useful. The verify loop starts `report-only` and earns `write` to dispatch fixes. | `mode: report-only` |
 | **owns** | The writable resources this loop **exclusively owns** so concurrent loops never collide. Shared read is fine; shared write must be rare - one loop owns each writable thing. | owns: branch `fix/*`, the verify ledger, worktree `.superloop/verify/worktree` |
+
+### Delivery extension
+
+`deliver` fills the delivery extension in `templates/contract.md` before INIT is complete. These
+fields are root-contract authority, not hints:
+
+| Field | What it pins |
+|---|---|
+| `project_brief` | frozen path plus digest; a later mismatch stops instead of rewriting scope |
+| `root_goal` | immutable destination/completion promise path plus digest; frontier revisions cannot rewrite it |
+| `source_ref` | verified base ref from which each isolated supergoal run starts |
+| `target_ref` / `target_is_shared` | intended integration ref and whether merging/pushing it is a consent gate |
+| `integration_proof` | exact command/artifact proving a ticket is present on the intended target state |
+| `deadline_or_duration` | hard project time bound; INIT converts duration once to immutable ledger `deadline_at` |
+| `scheduler_job_id` | CronCreate id used for audit and CronDelete; use `dynamic` or `single-tick` when no cron exists |
+| `launch_prompt` | original `/loop ...` launch message verbatim; audit only, never re-parsed |
+| `scheduled_payload` | parsed delivery prompt (no interval token); the fixed cron payload |
+| `dynamic_reentry_prompt` | `/loop `-prefixed dynamic wakeup prompt; `none` in fixed mode |
+| `lease_recovery_rule` | objective owner-death proof, expiry grace, and actor allowed to recover a stale lease; age alone never authorizes recovery |
+| `preauthorized_local_actions` | explicit unattended local actions; plan approval and local commit/non-shared integration acceptance are separate grants |
+| `fresh_reentry` | reconstruct from disk and do not depend on chat memory |
+
+Verify both refs before INIT writes tickets. `preauthorized_local_actions` cannot waive gates:
+push, deploy, destructive/force operations, shared-branch merge, ticket-system writes, and every data
+write still require explicit consent. Plan auto-approval is not commit acceptance. An unspecified
+action is not preauthorized. An explicitly authorized scheduled delivery may start `mode: write`;
+otherwise INIT records `report-only` and gates before product dispatch.
 
 ## Budget - hard ceilings (the "$400 overnight" guard)
 
@@ -55,6 +82,9 @@ mission reference lists its own; common ones:
 - `green_signal_wrong_outcome` - checks pass but the real result is wrong -> escalate (see SKILL.md Escalation triggers).
 - `all_criteria_proven` - every acceptance criterion has fresh proof -> success stop; the verify loop is done.
 - `orchestrator_cannot_close_gap` - the same criterion fails after the fix-directive limit -> escalate, don't grind.
+- `all_tickets_integrated` - every delivery ticket has exact integration evidence -> success stop.
+- `frontier_blocked` - incomplete delivery remains but no ticket is dependency-safe -> stop and report.
+- `deadline_reached` - the delivery time bound expired before a claim -> stop and delete/omit pacing.
 
 A named stop is cheaper than the circuit breaker: it halts at the first principled signal, before
 three ticks of spend.
@@ -86,6 +116,10 @@ glob. Two loops may read anything, but no two loops write the same resource:
 
 This is what makes it safe to run several superloops at once: the worktree (`reference/worktree.md`)
 is the write space, and `owns` is the promise that nothing else writes there.
+
+Deliver also uses a project-scoped atomic `mkdir .superloop/deliver/lease`. `owns` defines authority;
+the lease serializes that authority. If the lease is held or ownership is uncertain, the new tick
+fails closed without dispatching another ticket.
 
 ## Framing the loop's goal
 

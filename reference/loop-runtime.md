@@ -34,6 +34,11 @@ Convert the interval, then call CronCreate with `recurring: true` and the parsed
   job ID for CronDelete.
 - **Then execute the parsed prompt immediately** - don't wait for the first cron fire.
 
+For a new fixed-interval deliver loop, record CronCreate's id as `scheduler_job_id`, then execute the
+prompt immediately: **deliver INIT runs immediately** and stops after durable bootstrap; it does not
+dispatch a product ticket. The first cron fire re-enters TICK. If a ready delivery ledger already
+exists, the immediate execution is a normal resume TICK.
+
 ## Dynamic mode (no interval - self-paced)
 
 1. **Run the parsed prompt now** (slash command -> Skill tool; otherwise act directly).
@@ -54,6 +59,41 @@ Convert the interval, then call CronCreate with `recurring: true` and the parsed
    the wake signal; this only resets the safety net.
 6. **Stop the loop**: **omit the ScheduleWakeup call** and TaskStop any Monitor you armed. For cron
    loops, CronDelete the job ID.
+
+## Delivery re-entry and duration
+
+Launch fixed delivery with `/loop 30m /superloop deliver <project-brief>` (choose the interval that
+fits the project's ticket size). INIT freezes that brief, the root contract, Frontier Map, tickets,
+and delivery ledger. Every later fire must **reconstruct from disk** before selecting work and must
+not depend on chat history, even when the host happens to reuse a session. The installed supergoal
+still uses fresh role contexts for each active spec.
+
+The root contract and delivery ledger record:
+
+- `deadline_or_duration` - for a one- or two-day run, an exact deadline or duration bounded below
+  the host's 7-day automatic expiry; INIT converts a duration once to immutable `deadline_at`;
+- `scheduler_job_id` - the CronCreate id, or `dynamic` / `single-tick` when there is no cron; and
+- `launch_prompt` - the original `/loop ...` launch message verbatim, kept for audit only and never
+  re-parsed on re-entry;
+- `scheduled_payload` - the parsed delivery prompt without the interval token, recorded in both
+  modes; a fixed loop's CronCreate receives `scheduled_payload` and never receives `launch_prompt`;
+  and
+- `dynamic_reentry_prompt` - dynamic mode's exact wakeup prompt (the `/loop `-prefixed payload),
+  `none` in fixed mode; plus the frozen project-brief and root-goal digests and current active
+  ticket/run id.
+
+At the start of ORIENT, check the deadline before a new claim. `deadline_reached`,
+`all_tickets_integrated`, `active_ticket_blocked` (max consecutive failed ticks on one active
+ticket), or another named delivery stop releases the lease and stops cleanly: dynamic mode omits
+ScheduleWakeup; fixed mode calls CronDelete with the recorded job id. Never rely
+on eventual auto-expiry as the normal stop. RECORD and lease release happen before dynamic
+ScheduleWakeup, which remains the last action of the turn.
+
+Each fixed re-entry also reconciles `scheduler_job_id` against the scheduler. If it is absent or its
+status cannot be read, record `scheduler_job_missing`, release the lease, and stop before dispatch;
+never create a replacement job silently. If the deadline or a mandatory check-in is reached while a
+ticket is active, persist its phase, keep the active ticket unchanged, release the lease, and stop
+pacing. A later explicitly authorized resume continues that ticket before any sibling.
 
 ## Cache-aware pacing
 
@@ -80,7 +120,8 @@ whole conversation uncached.
 
 Bare `/loop` (no prompt) looks for a loop-tasks file at `.claude/loop.md` (project) or `~/.claude/loop.md`
 (capped at 25000 bytes) and runs its tasks each tick via a sentinel prompt that re-expands when the
-file is edited. To run the verify loop this way, put `/superloop verify` there.
+file is edited. Put `/superloop verify` there for acceptance checks, or
+`/superloop deliver <project-brief>` for durable project delivery.
 
 ## Launch recipes
 
@@ -90,6 +131,9 @@ file is edited. To run the verify loop this way, put `/superloop verify` there.
 | Verify an orchestrator's delivery, event-driven | `/loop /superloop verify` (dynamic + Monitor on CI/deploy) |
 | Nightly acceptance sweep | `/loop 1d /superloop verify` (or /schedule for a durable cloud routine) |
 | One acceptance tick right now | `/superloop verify` |
+| Initialize, then deliver one vertical ticket per 30-minute fire | `/loop 30m /superloop deliver <project-brief>` |
+| Self-paced project delivery | `/loop /superloop deliver <project-brief>` |
+| Initialize or resume one delivery tick now | `/superloop deliver <project-brief>` |
 
 Session-bound: /loop jobs die with the session and recurring jobs auto-expire after 7 days - for
 durable schedules point the user at /schedule.
