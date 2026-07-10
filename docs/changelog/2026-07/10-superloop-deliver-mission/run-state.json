@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "mode": "LEGACY",
+  "intent_gate": {
+    "intent": "Add scheduled fresh-context project delivery to superloop without changing verify semantics",
+    "confidence": "high",
+    "mode": "LEGACY",
+    "capability_refs": ["supergoal", "skill-creator", "codebase-memory"],
+    "uncertainty": "Host scheduler outer-session isolation varies; portable behavior uses disk-only reconstruction"
+  },
+  "branches": {
+    "source_base_branch": "main",
+    "target_integration_branch": "main",
+    "run_branch": "codex/superloop-deliver-lms",
+    "worktree_path": "/private/tmp/superloop-deliver-lms-20260710",
+    "refs_verified": true
+  },
+  "plan_approval": "auto",
+  "completion_promise": {
+    "promised_outcome": "A backward-compatible deliver mission advances one vertical ticket per scheduled fresh-context tick through installed supergoal",
+    "required_proof": ["all shell contract tests", "git diff --check", "fresh-context forward test"],
+    "stop_condition": "all GOAL criteria checked or iteration cap forces reflection",
+    "max_iterations": 4,
+    "status": "proven"
+  },
+  "phase": "ExactVerify",
+  "iteration": 1,
+  "unresolved_gates": [],
+  "regression_ledger": ["existing verify contract", "loop runtime contract", "observability contract"],
+  "blockers": [],
+  "last_proof_command": "for t in tests/*.test.sh; do bash \"$t\"; done && git diff --check",
+  "next_action": "Await explicit user approval to merge codex/superloop-deliver-lms into main; next frontier ticket DISC-001 (Figma feature discovery)",
+  "forced_reflection": {
+    "required_when_iteration_cap_hit": true,
+    "what_keeps_failing": "",
+    "likely_root_cause": "",
+    "unproven_requirement": "",
+    "regressed_previously_green": "",
+    "smallest_next_action": ""
+  },
+  "updated_at": "2026-07-10T15:15:55Z"
+}
