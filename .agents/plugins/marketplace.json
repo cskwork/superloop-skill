@@ -1,0 +1,21 @@
+{
+  "name": "superloop",
+  "interface": {
+    "displayName": "Superloop"
+  },
+  "plugins": [
+    {
+      "name": "superloop",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/cskwork/superloop-skill.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
