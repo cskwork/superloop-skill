@@ -1,4 +1,4 @@
 # superloop
 
-@./SKILL.md
+@./skills/superloop/SKILL.md
 

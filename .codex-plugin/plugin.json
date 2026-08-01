@@ -15,7 +15,7 @@
     "claude-code",
     "codex"
   ],
-  "skills": "./",
+  "skills": "./skills/",
   "interface": {
     "displayName": "Superloop",
     "shortDescription": "Use when a /loop should hold an orchestrator's delivery to its intent or advance",
