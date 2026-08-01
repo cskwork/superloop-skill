@@ -6,7 +6,7 @@
 ### Install
 
 ```bash
-claude plugin marketplace add cskwork/superloop
+claude plugin marketplace add cskwork/superloop-skill
 claude plugin install superloop@superloop
 ```
 
@@ -39,7 +39,7 @@ claude plugin marketplace remove superloop
 ### Install
 
 ```bash
-codex plugin marketplace add cskwork/superloop --ref main
+codex plugin marketplace add cskwork/superloop-skill --ref main
 codex plugin add superloop@superloop
 ```
 
@@ -66,14 +66,14 @@ codex plugin marketplace remove superloop
 ### Install (extension, always-on)
 
 ```bash
-gemini extensions install https://github.com/cskwork/superloop
+gemini extensions install https://github.com/cskwork/superloop-skill
 ```
 
 ### Install (command, opt-in)
 
 ```bash
 mkdir -p ~/.gemini/commands
-curl -fsSL https://raw.githubusercontent.com/cskwork/superloop/main/skills/superloop/agents/gemini.toml \
+curl -fsSL https://raw.githubusercontent.com/cskwork/superloop-skill/main/skills/superloop-skill/agents/gemini.toml \
   -o ~/.gemini/commands/superloop.toml
 ```
 
@@ -99,8 +99,8 @@ gemini extensions uninstall superloop
 ### Install
 
 ```bash
-npx skills add cskwork/superloop
-npx skills add cskwork/superloop -g
+npx skills add cskwork/superloop-skill
+npx skills add cskwork/superloop-skill -g
 ```
 
 Type `/superloop` in a new agent chat.
@@ -131,7 +131,7 @@ npx skills remove superloop
 ### Install
 
 ```bash
-agy plugin install https://github.com/cskwork/superloop
+agy plugin install https://github.com/cskwork/superloop-skill
 ```
 
 ### Verify

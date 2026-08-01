@@ -6,8 +6,8 @@
     "name": "cskwork",
     "url": "https://github.com/cskwork"
   },
-  "homepage": "https://github.com/cskwork/superloop",
-  "repository": "https://github.com/cskwork/superloop",
+  "homepage": "https://github.com/cskwork/superloop-skill",
+  "repository": "https://github.com/cskwork/superloop-skill",
   "license": "MIT",
   "keywords": [
     "superloop",
@@ -25,7 +25,7 @@
     "capabilities": [
       "Instructions"
     ],
-    "websiteURL": "https://github.com/cskwork/superloop",
+    "websiteURL": "https://github.com/cskwork/superloop-skill",
     "defaultPrompt": [
       "Use superloop for this task."
     ],
