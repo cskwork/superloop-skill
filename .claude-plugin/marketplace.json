@@ -1,0 +1,16 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "superloop",
+  "description": "Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at ",
+  "owner": {
+    "name": "cskwork"
+  },
+  "plugins": [
+    {
+      "name": "superloop",
+      "description": "Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at ",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

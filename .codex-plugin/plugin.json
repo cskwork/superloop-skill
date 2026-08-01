@@ -1,0 +1,34 @@
+{
+  "name": "superloop",
+  "version": "0.1.0",
+  "description": "Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at a time across scheduled fresh-context ticks. Verify completed work against acceptance criteria, or durably delegate each project ticket to installed supergoal until the frontier is integrated.",
+  "author": {
+    "name": "cskwork",
+    "url": "https://github.com/cskwork"
+  },
+  "homepage": "https://github.com/cskwork/superloop",
+  "repository": "https://github.com/cskwork/superloop",
+  "license": "MIT",
+  "keywords": [
+    "superloop",
+    "skill",
+    "claude-code",
+    "codex"
+  ],
+  "skills": "./",
+  "interface": {
+    "displayName": "Superloop",
+    "shortDescription": "Use when a /loop should hold an orchestrator's delivery to its intent or advance",
+    "longDescription": "Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at a time across scheduled fresh-context ticks. Verify completed work against acceptance criteria, or durably delegate each project ticket to installed supergoal until the frontier is integrated.",
+    "developerName": "cskwork",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions"
+    ],
+    "websiteURL": "https://github.com/cskwork/superloop",
+    "defaultPrompt": [
+      "Use superloop for this task."
+    ],
+    "brandColor": "#2563EB"
+  }
+}
