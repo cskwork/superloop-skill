@@ -1,3 +1,5 @@
+<p align="center"><img src="logo.png" width="120" alt="logo" /></p>
+
 # superloop-skill
 
 A Claude Code skill that verifies an orchestrator's delivery or advances a large project one
