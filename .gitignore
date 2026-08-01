@@ -1,5 +1,6 @@
-.superloop/
 .DS_Store
-.superdesign/
 __pycache__/
-*.pyc
+*.py[cod]
+evals/results/
+node_modules/
+dist/
