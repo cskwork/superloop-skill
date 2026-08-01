@@ -1,6 +1,6 @@
 ---
 name: superloop
-description: Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at a time across scheduled fresh-context ticks. Verify completed work against acceptance criteria, or durably delegate each project ticket to installed supergoal until the frontier is integrated.
+description: Use /loop to verify a delivery or advance a project one ticket per tick against acceptance criteria.
 ---
 
 # /superloop - verify a delivery or advance a project frontier
