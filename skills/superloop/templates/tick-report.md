@@ -6,4 +6,4 @@
 - Queue: <X open, Y done, Z blocked/awaiting-approval>; next: <next unit or "empty - backing off">
 - Pace: <cron refires | wakeup in Ns because ... | Monitor armed on ...>
 
-Awaiting approval (if any): <exact action needing consent, e.g. "merge fix/A20-812 into aidt-dev">
+Awaiting approval (if any): <exact action needing consent, e.g. "merge fix/PROJ-812 into the deploy branch">

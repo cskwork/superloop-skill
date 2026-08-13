@@ -50,7 +50,7 @@ Deliver uses a separate state model rather than overloading criterion statuses:
   transition.
 - **Single delivery writer.** The deliver mission acquires the atomic project lease before reading
   state for mutation and releases it before PACE. A held or uncertain lease fails closed.
-- **Reconcile at ORIENT.** Ledger says branch `fix/A20-999` but git says `aidt-prd`? Reality wins;
+- **Reconcile at ORIENT.** Ledger says branch `fix/PROJ-999` but git says `main`? Reality wins;
   log the drift as part of the tick and repair the queue before picking.
 - **Evidence is a pointer, not a paste.** Store command output in `evidence/` files; the ledger
   line references the path. Keeps the ledger readable and the context cheap.

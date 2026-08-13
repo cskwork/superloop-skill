@@ -15,7 +15,7 @@ clean until the loop has something verified and consented to merge. This is also
 
 ## Layout
 
-One worktree per write mission, a linked worktree of the **target repo** (for aidt, the affected
+One worktree per write mission, a linked worktree of the **target repo** (in a monorepo, the affected
 **service** repo, not the monorepo root):
 
 ```
@@ -33,7 +33,7 @@ worktree root resolves to its own path, so `sl-emit` reports it distinctly on th
 3. **Reconcile at ORIENT.** Confirm the worktree exists and sits on the expected branch; if git
    disagrees (user removed it, branch moved), reality wins - repair or recreate before picking.
 4. **Merge** into the working or shared branch only after VERIFY is green **and** consent is given.
-   Merging to a shared branch (`aidt-dev`, etc.) is already a consent gate (SKILL.md); the worktree
+   Merging to a shared branch (`develop`, etc.) is already a consent gate (SKILL.md); the worktree
    does not change that - it just keeps the working branch clean until that gate passes.
 5. **Remove** the worktree (`git worktree remove`) once the criterion's fix is merged and `proven`, so a
    stale checkout never lingers between loops.

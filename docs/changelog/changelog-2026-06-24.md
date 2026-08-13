@@ -55,7 +55,7 @@ ORIENT..PACE로, task status를 ledger queue 상태에 매핑). emit 기본 ON, 
 
 - 전체 contract test PASS: 69 → **100 assertions**, FAIL 0
   (loop-runtime 18 + mission-jira 29 + observability 22 신규 + skill-contract 31).
-- 기존 핀 문자열 전부 보존(jira BRANCH `origin/aidt-prd`·`fix/{TICKET}`·`service directory` 등) —
+- 기존 핀 문자열 전부 보존(jira BRANCH `origin/main`·`fix/{TICKET}`·`service directory` 등) —
   worktree/budget 문구는 가산만.
 - Board 무비용 스모크: opt-in 게이트(미설정 시 무출력) → `SUPERLOOP_TUI=1 sl-emit` → 유효 heartbeat
   생성 → 두 번째 emit이 board carry-forward + 상태 전이 → `python3 -m tui.state`가 liveness 파생해
