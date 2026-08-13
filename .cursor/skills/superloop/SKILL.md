@@ -117,8 +117,8 @@ artifacts and named integration proof. Full protocol: `reference/mission-deliver
 
 ## Safety rails (autonomy contract)
 
-- **Consent gates.** Outward or destructive steps - push/merge to shared branches (`aidt-dev`,
-  `aidt-stg`, `aidt-prd`), deploys, ticket transitions/comments, any data write, force ops -
+- **Consent gates.** Outward or destructive steps - push/merge to a shared branch (`main`,
+  `develop`, a release branch), deploys, ticket transitions/comments, any data write, force ops -
   require **explicit consent** from the user. The loop runs unattended, so a gate means: mark the
   current unit `awaiting-approval` in the ledger and say exactly what approval is needed. Verify may
   move to another criterion; deliver keeps the ticket active and never claims a sibling. A gate is
