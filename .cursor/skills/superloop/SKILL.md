@@ -1,6 +1,6 @@
 ---
 name: superloop
-description: Use when a /loop should hold an orchestrator's delivery to its intent or advance a large project one vertical ticket at a time across scheduled fresh-context ticks. Verify completed work against acceptance criteria, or durably delegate each project ticket to installed supergoal until the frontier is integrated.
+description: Use when a /loop must prove an orchestrator's completed delivery against its original intent and acceptance criteria, or advance a multi-feature project one vertical ticket at a time.
 ---
 
 # /superloop - verify a delivery or advance a project frontier
@@ -12,8 +12,8 @@ from disk, use the same ORIENT/PICK/EXECUTE/VERIFY/RECORD/PACE spine, and keep m
 and completion semantics.
 
 **Invocation.**
-- `/loop 30m /superloop verify` - fixed interval, one criterion checked per tick (see
-  `reference/loop-runtime.md`)
+- `/loop 30m /superloop verify` - fixed interval, one criterion checked per tick; create the cron
+  job per `reference/loop-runtime.md`
 - `/loop /superloop verify` - dynamic mode; the model self-paces and uses Monitor for event-gated
   waits (CI, deploy, PR review)
 - `/superloop verify` - single tick now (also how every cron/wakeup fire re-enters)
@@ -32,8 +32,8 @@ durable record; the Board is a live lens that never gates a tick (`reference/obs
 
 ## Missions and units
 
-`verify` keeps its original criterion contract. Its unit-queue is not commits or files but the
-**acceptance criteria** derived from the delivered intent - each a clause of an **Intent Spec**
+`verify`'s unit-queue is not commits or files but the **acceptance criteria** derived from the
+delivered intent - each a clause of an **Intent Spec**
 (`templates/intent-spec.md`) with a required proof type (test / build / HTTP body / DB read /
 architecture check). ORIENT builds the spec (below); full protocol: `reference/mission-verify.md`;
 fix dispatch: `reference/orchestrator-handoff.md`. Custom scope: text after `verify`, or a path to a
@@ -48,9 +48,8 @@ artifacts and named integration proof. Full protocol: `reference/mission-deliver
 ## Core principles
 
 - **Contract before the first tick.** Each loop has a one-page contract - trigger, scope,
-  permissions, budget, stop, report, mode, owns. The clearest contract (not the most agents) is what
-  makes an unattended loop trustworthy. Write it from `templates/contract.md`, record it in the
-  ledger's `## Contract`, read it every ORIENT (`reference/loop-contract.md`).
+  permissions, budget, stop, report, mode, owns. Write it from `templates/contract.md`, record it in
+  the ledger's `## Contract`, read it every ORIENT (`reference/loop-contract.md`).
 - **One mission-specific unit per tick.** For verify: **One criterion per tick**, one clause of the
   Intent Spec checked or fixed. For deliver: one active vertical ticket resumed or claimed, with no
   sibling started after it closes. This is one unit of work per tick; never batch to make a tick look
@@ -157,8 +156,7 @@ artifacts and named integration proof. Full protocol: `reference/mission-deliver
 superloop's contract mirrors **Codex routines** (Boris Cherny): trigger + scope + budget + stop +
 report, the loop as the manager of engineering work, not a one-shot script. Convergence is
 **Ralph**'s completion-promise: never emit "done" unless it is unequivocally true. Execution
-discipline - smallest correct change, failing test first, verify vs real tests/spec - is
-**supergoal**'s throughout.
+discipline is **supergoal**'s throughout.
 
 ## Reference map (load only what the tick needs)
 
@@ -168,7 +166,7 @@ discipline - smallest correct change, failing test first, verify vs real tests/s
 | `reference/orchestrator-handoff.md` | EXECUTE (direct shape) - the fix directive and fresh-context re-verify |
 | `reference/mission-deliver.md` | Deliver INIT/TICK - frontier, lease, one active ticket, exact close, stops |
 | `reference/supergoal-handoff.md` | Deliver EXECUTE/VERIFY - installed supergoal packet, resume, exact artifacts |
-| `reference/prompting-insights.md` | How to run the loop the user's way - evidence over vibes, spec over tests |
+| `reference/prompting-insights.md` | VERIFY and writing a fix directive - evidence over vibes, spec over tests |
 | `reference/loop-runtime.md` | Launching a loop, PACE step, Monitor wiring, stopping |
 | `reference/loop-runner-pitfalls.md` | Building your own dispatcher (not `/loop`) - shell bugs that silently drop work |
 | `reference/loop-contract.md` + `templates/contract.md` | Before the first tick - the loop contract (scope, permissions, budget, stop, mode, owns) |
