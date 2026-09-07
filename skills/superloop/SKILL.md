@@ -118,7 +118,7 @@ artifacts and named integration proof. Full protocol: `reference/mission-deliver
 
 - **Consent gates.** Outward or destructive steps - push/merge to a shared branch (`main`,
   `develop`, a release branch), deploys, ticket transitions/comments, any data write, force ops -
-  require **explicit consent** from the user. The loop runs unattended, so a gate means: mark the
+  require **explicit consent** covering the action and target; reuse consent already recorded in the loop contract. When permission is missing, mark the
   current unit `awaiting-approval` in the ledger and say exactly what approval is needed. Verify may
   move to another criterion; deliver keeps the ticket active and never claims a sibling. A gate is
   never skipped because the loop is autonomous.
