@@ -5,7 +5,7 @@
 
 set -u
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../skills/superloop" && pwd)"
 PASS=0
 FAIL=0
 
@@ -40,8 +40,8 @@ require_text "deliver mission referenced" "SKILL.md" "reference/mission-deliver.
 require_file "deliver mission reference exists" "reference/mission-deliver.md"
 require_file "supergoal handoff reference exists" "reference/supergoal-handoff.md"
 require_file "delivery ledger template exists" "templates/delivery-ledger.md"
-require_file "executable delivery recovery fixture exists" "tests/fixtures/delivery-state-machine.sh"
-require_file "delivery recovery scenario exists" "tests/delivery-state-machine.test.sh"
+require_file "executable delivery recovery fixture exists" "../../tests/fixtures/delivery-state-machine.sh"
+require_file "delivery recovery scenario exists" "../../tests/delivery-state-machine.test.sh"
 
 # INIT is a once-only bootstrap; later TICKs reconstruct solely from durable project state.
 require_text "INIT is explicitly once-only" "reference/mission-deliver.md" "INIT - bootstrap once"

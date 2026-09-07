@@ -5,7 +5,7 @@
 
 set -u
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../skills/superloop" && pwd)"
 PASS=0
 FAIL=0
 
