@@ -5,7 +5,7 @@
 
 set -u
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../skills/superloop" && pwd)"
 PASS=0
 FAIL=0
 
@@ -34,11 +34,11 @@ echo " /superloop observability contract   skill: $ROOT"
 echo "=================================================================="
 
 # Board reader UI + producer files all present.
-require_file "tui state reader exists" "tui/state.py"
-require_file "tui app exists" "tui/app.py"
-require_file "tui serve exists" "tui/serve.py"
-require_file "tui launcher exists" "tui/launch.sh"
-require_file "tui stylesheet exists" "tui/app.tcss"
+require_file "tui state reader exists" "../../tui/state.py"
+require_file "tui app exists" "../../tui/app.py"
+require_file "tui serve exists" "../../tui/serve.py"
+require_file "tui launcher exists" "../../tui/launch.sh"
+require_file "tui stylesheet exists" "../../tui/app.tcss"
 require_file "heartbeat emitter exists" "templates/observability/sl-emit.sh"
 require_file "heartbeat schema exists" "templates/observability/heartbeat.schema.json"
 require_file "observability reference exists" "reference/observability.md"
@@ -58,9 +58,9 @@ require_text "schema phase enum uses tick stages" "templates/observability/heart
 require_text "schema run dir is SUPERLOOP" "templates/observability/heartbeat.schema.json" "SUPERLOOP_RUN_DIR"
 
 # Launcher: terminal board is the default surface, web is opt-in.
-require_text "terminal Textual board is the default" "tui/launch.sh" "terminal Textual board"
-require_text "web board is opt-in via --web" "tui/launch.sh" "--web"
-require_text "launcher enables emission for every mode" "tui/launch.sh" ".enabled"
+require_text "terminal Textual board is the default" "../../tui/launch.sh" "terminal Textual board"
+require_text "web board is opt-in via --web" "../../tui/launch.sh" "--web"
+require_text "launcher enables emission for every mode" "../../tui/launch.sh" ".enabled"
 
 # SKILL wires the Board as the default recording surface, emitted each tick.
 require_text "SKILL: Board is the default recording surface" "SKILL.md" "default recording surface"
