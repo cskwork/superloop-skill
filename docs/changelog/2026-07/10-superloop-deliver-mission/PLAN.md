@@ -27,7 +27,7 @@ Frozen plan. A fresh-context implementer reads only this file and builds it.
 ## Tools & Skills
 
 - Skills: `supergoal`, `skill-creator`, `codebase-memory`.
-- Structural discovery: codebase-memory project `Users-danny-Documents-PARA-Resource-superloop-skill`; re-index after edits.
+- Structural discovery: codebase-memory project `Users-<user>-Documents-PARA-Resource-superloop-skill`; re-index after edits.
 - Tests: `bash tests/deliver-contract.test.sh`; `for t in tests/*.test.sh; do bash "$t"; done`; `git diff --check`.
 - No browser or DB proof is needed for this skill-contract slice.
 
